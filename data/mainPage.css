@@ -1,0 +1,26 @@
+h1 {
+  color: Green;
+  text-align: center;
+}
+
+.container {
+  text-align: center;
+}
+
+.gfg {
+  margin: 10px auto;
+  padding: 10px;
+  background-color: lightgreen;
+  width: 250px;
+  height: 100px; /* Reduced height to trigger scrolling */
+  overflow-y: auto; /* Enables vertical scrolling */
+  border: 2px solid green;
+}
+
+.sub-section {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
