@@ -2,14 +2,10 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include "wifi_pass.hpp"
 
-#ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK "your-password"
-#endif
-
-const char *ssid = STASSID;
-const char *password = STAPSK;
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 void setup()
 {

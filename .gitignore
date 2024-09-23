@@ -5,5 +5,4 @@
 .vscode/ipch
 data/server.crt
 data/server.key
-.data/wifi_pass.hpp
-data/wifi_pass.hpp
+src/wifi_pass.hpp
