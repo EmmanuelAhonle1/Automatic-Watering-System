@@ -2,8 +2,8 @@
 #include <ESP8266WebServer.h>
 int statusChecker(void);
 void checkWifiStatus(void);
-void initWiFiChecker(void);
 void initServerAndWebPage(void);
+void initWifi(void);
 
 extern bool ledOn;
 extern WebSocketsServer webSocket;

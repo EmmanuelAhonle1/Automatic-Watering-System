@@ -6,9 +6,13 @@
 #include <LittleFS.h>
 #include "FS.h"
 #include <ArduinoJson.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include "wifi_pass.hpp"
 //  WiFi credentials
-const char *ssid = "ATTxVJubdF";
-const char *password = "6rharq6k433i";
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 // Create web server object on port 80
 ESP8266WebServer server(80);
@@ -59,12 +63,6 @@ void notifyLEDStatusChange()
 void checkWifiStatus(void)
 {
     int statusVal = statusChecker();
-}
-
-Ticker timer;
-void initWiFiChecker(void)
-{
-    // timer.attach_ms(500, checkWifiStatus);
 }
 
 // WebSocket event handler
@@ -119,6 +117,8 @@ void handleScript()
 
 void initServerAndWebPage(void)
 {
+
+    WiFi.mode(WIFI_STA);
     Serial.println("");
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
@@ -140,4 +140,15 @@ void initServerAndWebPage(void)
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
     Serial.println("WebSocket server started");
+}
+
+void initWifi(void)
+{ // Connect to Wi-Fi
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to WiFi");
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(500);
+        Serial.print(".");
+    }
 }
