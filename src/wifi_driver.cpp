@@ -79,7 +79,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 void handleRoot()
 {
-    String path = "/mainPage.html";
+    String path = "/mainPage/mainPage.html";
     File file = LittleFS.open(path, "r");
     if (!file)
     {
@@ -92,7 +92,7 @@ void handleRoot()
 
 void handleStyleSheet(void)
 {
-    String path = "/mainPage.css";
+    String path = "/mainPage/mainPage.css";
     File file = LittleFS.open(path, "r");
     if (!file)
     {
@@ -104,7 +104,7 @@ void handleStyleSheet(void)
 
 void handleScript()
 {
-    String path = "/mainPage.js";
+    String path = "/mainPage/mainPage.js";
     File file = LittleFS.open(path, "r");
     if (!file)
     {
@@ -126,11 +126,10 @@ void initServerAndWebPage(void)
 
     // Route for root / web page
     server.on("/", HTTP_GET, handleRoot);
-
-    // Route for script
+    server.on("/mainPage.css", HTTP_GET, handleStyleSheet);
     server.on("/mainPage.js", HTTP_GET, handleScript);
 
-    server.on("/mainPage.css", HTTP_GET, handleStyleSheet);
+    server.serveStatic("/", LittleFS, "/");
 
     // Start the server
     server.begin();
