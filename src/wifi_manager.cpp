@@ -30,7 +30,7 @@ void WiFiManager::setupConfigRoutes()
                     DynamicJsonDocument creds(512);
                     creds["ssid"] = ssid;
                     creds["password"] = password;
-                    creds["name"] = deviceName;
+                    creds["name"] = deviceManager->getName();
                     serializeJson(creds, file);
                     file.close();
                 }
@@ -41,7 +41,8 @@ void WiFiManager::setupConfigRoutes()
         }
         
         String jsonResponse;
-        serializeJson(response, server); });
+        serializeJson(response, jsonResponse);
+        server.send(200, "application/json", jsonResponse); });
 
     server.on("/wifi-scan", HTTP_GET, [this]()
               {
@@ -56,7 +57,9 @@ void WiFiManager::setupConfigRoutes()
             network["encrypted"] = WiFi.encryptionType(i) != ENC_TYPE_NONE;
         }
         
-        serializeJson(doc, server); });
+        String jsonResponse;
+        serializeJson(doc, jsonResponse);
+        server.send(200, "application/json", jsonResponse); });
 
     server.on("/wifi-config", HTTP_GET, [this]()
               {
@@ -107,13 +110,13 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 void WiFiManager::setupAccessPoint()
 {
     WiFi.mode(WIFI_AP);
-    bool apStarted = WiFi.softAP(deviceName.c_str());
+    bool apStarted = WiFi.softAP(deviceManager->getName().c_str());
 
     if (apStarted)
     {
         Serial.println("Access Point Started");
         Serial.print("Network Name: ");
-        Serial.println(deviceName);
+        Serial.println(deviceManager->getName());
         Serial.print("IP Address: ");
         Serial.println(WiFi.softAPIP());
     }
