@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WiFi Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="wifi-config/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>WiFi Setup</h1>
+      <div class="device-name" id="deviceName"></div>
+      <form id="wifi-form">
+        <div class="form-group">
+          <label for="network">Select Network:</label>
+          <select id="network" name="ssid" required>
+            <option value="">Scanning...</option>
+          </select>
+          <button type="button" onclick="scanNetworks()">
+            Refresh Networks
+          </button>
+        </div>
+        <div class="form-group">
+          <label for="password"
+            >Password (leave empty for open networks):</label
+          >
+          <input type="password" id="password" name="password" />
+        </div>
+        <button type="submit">Connect</button>
+      </form>
+      <div id="status"></div>
+    </div>
+    <script src="wifi-config/script.js"></script>
+  </body>
+</html>
