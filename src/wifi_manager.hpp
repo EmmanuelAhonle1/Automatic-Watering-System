@@ -1,29 +1,22 @@
-// wifi_manager.hpp
-#ifndef WIFI_MANAGER_HPP
-#define WIFI_MANAGER_HPP
-
-#include <ESP8266WiFi.h>
+#pragma once
 #include <ESP8266WebServer.h>
-#include <LittleFS.h>
 #include <ArduinoJson.h>
 #include "device_manager.hpp"
 
 class WiFiManager
 {
 private:
-    void setupConfigRoutes();
-    bool connect(const String &ssid, const String &password);
-
     ESP8266WebServer &server;
     DeviceManager *deviceManager;
 
+    bool connect(const String &ssid, const String &password);
+    void setupConfigRoutes();
+    void setupAccessPoint();
+
 public:
-    WiFiManager(ESP8266WebServer &serverRef, DeviceManager *deviceManagerRef)
-        : server(serverRef), deviceManager(deviceManagerRef) {}
+    WiFiManager(ESP8266WebServer &server, DeviceManager *dm)
+        : server(server), deviceManager(dm) {}
 
     void begin();
     void handleClient() { server.handleClient(); }
-    void setupAccessPoint();
 };
-
-#endif // WIFI_MANAGER_HPP

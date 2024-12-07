@@ -14,54 +14,40 @@ public:
 
     void begin()
     {
-        // Configure OTA
-        ArduinoOTA.setHostname(deviceManager->getName().c_str());
-
         ArduinoOTA.onStart([]()
-                           { Serial.println("OTA: Start"); });
+                           {
+            String type;
+            if (ArduinoOTA.getCommand() == U_FLASH) {
+                type = "sketch";
+            } else {  // U_FS
+                type = "filesystem";
+                LittleFS.end();  // Unmount filesystem
+            }
+            Serial.println("Start updating " + type); });
 
         ArduinoOTA.onEnd([]()
-                         { Serial.println("\nOTA: End"); });
+                         { Serial.println("\nEnd"); });
 
         ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
-                              { Serial.printf("OTA Progress: %u%%\r", (progress / (total / 100))); });
+                              { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
 
         ArduinoOTA.onError([](ota_error_t error)
                            {
-            Serial.printf("OTA Error[%u]: ", error);
-            switch(error) {
-                case OTA_AUTH_ERROR: 
-                    Serial.println("Auth Failed");
-                    break;
-                case OTA_BEGIN_ERROR: 
-                    Serial.println("Begin Failed");
-                    break;
-                case OTA_CONNECT_ERROR: 
-                    Serial.println("Connect Failed");
-                    break;
-                case OTA_RECEIVE_ERROR: 
-                    Serial.println("Receive Failed");
-                    break;
-                case OTA_END_ERROR: 
-                    Serial.println("End Failed");
-                    break;
-            } });
+            Serial.printf("Error[%u]: ", error);
+            if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+            else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+            else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+            else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+            else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
 
         ArduinoOTA.begin();
-        Serial.println("OTA manager initialized");
-
-        // Set up MDNS responder
-        if (MDNS.begin(deviceManager->getName().c_str()))
-        {
-            Serial.println("MDNS responder started");
-            MDNS.addService("http", "tcp", 80);
-            MDNS.addService("ota", "udp", 8266);
-        }
+        Serial.println("OTA Ready");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
     }
 
     void handle()
     {
         ArduinoOTA.handle();
-        MDNS.update();
     }
 };
