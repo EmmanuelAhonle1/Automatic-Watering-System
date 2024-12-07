@@ -27,3 +27,31 @@ const char *getStateName(PlantNodeState state)
         return "UNKNOWN";
     }
 }
+
+// Valid state transition rules
+bool canTransitionTo(PlantNodeState currentState, PlantNodeState newState)
+{
+    switch (currentState)
+    {
+    case STATE_SETUP:
+        return (newState == STATE_AP_CONFIG ||
+                newState == STATE_CONNECTING);
+
+    case STATE_AP_CONFIG:
+        return (newState == STATE_CONNECTING);
+
+    case STATE_CONNECTING:
+        return (newState == STATE_CONNECTED ||
+                newState == STATE_AP_CONFIG);
+
+    case STATE_CONNECTED:
+        return (newState == STATE_RECONNECTING);
+
+    case STATE_RECONNECTING:
+        return (newState == STATE_CONNECTED ||
+                newState == STATE_AP_CONFIG);
+
+    default:
+        return false;
+    }
+}
