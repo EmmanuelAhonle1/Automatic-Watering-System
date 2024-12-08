@@ -52,7 +52,7 @@ void WiFiManager::begin()
     setupAccessPoint();
     setupDNS();
     setupConfigRoutes();
-    setupOTA();
+    //setupOTA();
     server.begin();
 }
 
@@ -212,12 +212,13 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     WiFi.hostname(deviceManager->getName()); // Add this line
 
     int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20)
+    while (WiFi.status() != WL_CONNECTED && attempts < 10)
     {
         delay(1000);
         attempts++;
     }
 
+    setupOTA();
     return WiFi.status() == WL_CONNECTED;
 }
 
