@@ -11,11 +11,14 @@ private:
     ESP8266WebServer &server;
     DeviceManager *deviceManager;
     DNSServer dnsServer;
+
     bool connect(const String &ssid, const String &password);
     void setupConfigRoutes();
     void setupAccessPoint();
     void setupOTA();
     void setupDNS();
+    void sendCaptivePortalSuccess(const String &contentType, const String &content);
+    void disableAccessPoint();
 
 public:
     WiFiManager(ESP8266WebServer &server, DeviceManager *dm)

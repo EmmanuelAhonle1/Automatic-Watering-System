@@ -6,11 +6,9 @@ IPAddress apIP(192, 168, 4, 1);
 
 void WiFiManager::setupDNS()
 {
-    // Remove any filtering and respond with our IP to all DNS queries
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", apIP);
 
-    // Debug output
     Serial.println("DNS Server started");
     Serial.println("Captive Portal IP: " + apIP.toString());
 }
@@ -22,7 +20,7 @@ void WiFiManager::setupOTA()
         String type;
         if (ArduinoOTA.getCommand() == U_FLASH) {
             type = "sketch";
-        } else {  // U_FS
+        } else {
             type = "filesystem";
             LittleFS.end();
         }
@@ -47,12 +45,40 @@ void WiFiManager::setupOTA()
     Serial.println("OTA Ready");
 }
 
+void WiFiManager::sendCaptivePortalSuccess(const String &contentType, const String &content)
+{
+    server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    server.sendHeader("Pragma", "no-cache");
+    server.sendHeader("Expires", "-1");
+    server.sendHeader("Clear-Site-Data", "\"*\"");
+
+    if (server.hasHeader("User-Agent") && server.header("User-Agent").indexOf("CaptiveNetworkSupport") >= 0)
+    {
+        server.sendHeader("X-Apple-Success", "true");
+    }
+
+    server.send(200, contentType, content);
+}
+
+void WiFiManager::disableAccessPoint()
+{
+    // Ensure WiFi settings persist through disable/enable
+    WiFi.persistent(true);
+
+    // Disable AP
+    WiFi.softAPdisconnect(true);
+
+    // Switch to station-only mode
+    WiFi.mode(WIFI_STA);
+
+    Serial.println("Access Point disabled and station mode configured for stealth");
+}
+
 void WiFiManager::begin()
 {
     setupAccessPoint();
     setupDNS();
     setupConfigRoutes();
-    //setupOTA();
     server.begin();
 }
 
@@ -74,45 +100,68 @@ void WiFiManager::setupConfigRoutes()
             return;
         }
         
-        // Redirect all requests to the configuration page
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
-    // Add this to your existing setupConfigRoutes()
+    server.on("/disable-ap", HTTP_POST, [this]()
+              {
+        if (server.hasHeader("User-Agent")) {
+            String userAgent = server.header("User-Agent");
+            
+            if (userAgent.indexOf("CaptiveNetworkSupport") >= 0) {
+                // iOS device
+                sendCaptivePortalSuccess("text/html", 
+                    "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+            } else if (userAgent.indexOf("Microsoft") >= 0) {
+                // Windows device
+                sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
+            } else {
+                // Generic success response
+                sendCaptivePortalSuccess("text/plain", "Success");
+            }
+        } else {
+            sendCaptivePortalSuccess("text/plain", "Success");
+        }
+
+        disableAccessPoint(); });
+
+    // Captive portal detection endpoints
     server.on("/connecttest.txt", HTTP_GET, [this]()
-              { server.send(200, "text/plain", "Microsoft NCSI"); });
+              {
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
     server.on("/ncsi.txt", HTTP_GET, [this]()
-              { server.send(200, "text/plain", "Microsoft NCSI"); });
+              {
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
-    // Android captive portal detection
     server.on("/generate_204", HTTP_GET, [this]()
               {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", ""); });
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/plain", "");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
-    // Microsoft Windows captive portal detection
-    server.on("/ncsi.txt", HTTP_GET, [this]()
-              {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", ""); });
-
-    server.on("/connecttest.txt", HTTP_GET, [this]()
-              {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", ""); });
-
-    // Microsoft Edge and IE
-    server.on("/redirect", HTTP_GET, [this]()
-              {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", ""); });
-
-    // Apple Captive Portal detection
     server.on("/hotspot-detect.html", HTTP_GET, [this]()
               {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", ""); });
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/html", 
+                "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
     server.on("/fwlink", HTTP_GET, [this]()
               {
@@ -207,9 +256,7 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 {
     WiFi.mode(WIFI_AP_STA);
     WiFi.begin(ssid.c_str(), password.c_str());
-
-    // Set the hostname to the device's name
-    WiFi.hostname(deviceManager->getName()); // Add this line
+    WiFi.hostname(deviceManager->getName());
 
     int attempts = 0;
     while (WiFi.status() != WL_CONNECTED && attempts < 10)
@@ -225,7 +272,7 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 void WiFiManager::setupAccessPoint()
 {
     WiFi.mode(WIFI_AP);
-    WiFi.hostname(deviceManager->getName()); // Add this line
+    WiFi.hostname(deviceManager->getName());
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     bool apStarted = WiFi.softAP(deviceManager->getName().c_str());
 
