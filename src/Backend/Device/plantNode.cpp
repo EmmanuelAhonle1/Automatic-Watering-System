@@ -4,70 +4,11 @@
 #include <vector>
 #include <ArduinoJson.h>
 
+#include <Ethernet.h>
 #include <MySQL_Connection.h>
 #include <MySQL_Cursor.h>
-
+#include "../Credentials/credentials.h"
 using namespace std;
-using namespace chrono;
-
-// MySQL server settings
-const char *server_host = "automatic-watering-system.cdq4ye8ggh8i.us-east-1.rds.amazonaws.com"; // Your endpoint URL
-char user[] = "admin";
-char password_mysql[] = "Mighty_Duck1738";
-
-WiFiClient client;
-MySQL_Connection conn((Client *)&client);
-
-class DatabaseConnection
-{
-private:
-    // Connection settings
-    std::string host;
-    std::string user;
-    std::string password;
-    std::string database;
-
-public:
-    DatabaseConnection(std::string host, std::string user, std::string password, std::string database)
-    {
-        this->host = host;
-        this->user = user;
-        this->password = password;
-        this->database = database;
-    }
-
-    void connect()
-    {
-    }
-
-    void disconnect()
-    {
-    }
-
-    void executeQuery(std::string query)
-    {
-    }
-};
-
-class dateTime
-{
-private:
-    string time;
-
-public:
-    dateTime()
-    {
-        system_clock::time_point b = system_clock::now();
-
-        time_t c = system_clock::to_time_t(b);
-        time = ctime(&c);
-    }
-
-    operator string() const
-    {
-        return time;
-    }
-};
 
 class PlantNode
 {

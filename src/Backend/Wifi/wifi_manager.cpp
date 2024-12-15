@@ -1,9 +1,11 @@
 #include "wifi_manager.hpp"
 #include <DNSServer.h>
 #include "OTAManager.hpp"
+#include "../Device/dbConnection.hpp"
 
-const byte DNS_PORT = 53;
+const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
+DatabaseConnection awsDB;
 
 void WiFiManager::setupDNS()
 {
@@ -88,6 +90,7 @@ void WiFiManager::handleClient()
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
+    awsDB.connect();
 }
 
 void WiFiManager::setupConfigRoutes()

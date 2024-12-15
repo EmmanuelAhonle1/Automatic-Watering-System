@@ -20,6 +20,18 @@ private:
     string location;
 
 public:
+    /**
+     * @brief Construct a new Plant Node object
+     *
+     * @param pnUUID Plant node unique identifier
+     * @param userUUID User unique identifier
+     * @param nName Node name
+     * @param pSpecies Plant species
+     * @param wF Watering frequency
+     * @param sM Soil moisture
+     * @param lW Last watered date
+     * @param loc Location
+     */
     PlantNode(int pnUUID, int userUUID, string nName, string pSpecies, string wF, int sM, string lW, string loc);
 
     // Getters
@@ -51,12 +63,46 @@ private:
     vector<PlantNode> plantNodes;
 
 public:
+    /**
+     * @brief Construct a new Plant Node Manager object
+     */
     PlantNodeManager();
 
+    /**
+     * @brief Get the total number of plant nodes
+     *
+     * @return int Total number of plant nodes
+     */
     int getTotalNodes();
+
+    /**
+     * @brief Add a new plant node
+     *
+     * @param pn PlantNode object to add
+     */
     void addPlantNode(PlantNode &pn);
+
+    /**
+     * @brief Remove a plant node by its unique identifier
+     *
+     * @param plantNodeUUID Unique identifier of the plant node to remove
+     */
     void removePlantNode(int plantNodeUUID);
+
+    /**
+     * @brief Set the details of a plant node by its unique identifier
+     *
+     * @param plantNodeUUID Unique identifier of the plant node to set
+     * @param pn PlantNode object with updated details
+     */
     void setPlantNode(int plantNodeUUID, PlantNode &pn);
+
+    /**
+     * @brief Get the details of a plant node by its unique identifier
+     *
+     * @param plantNodeUUID Unique identifier of the plant node to get
+     * @return PlantNode PlantNode object with the details
+     */
     PlantNode getPlantNode(int plantNodeUUID);
 };
 
