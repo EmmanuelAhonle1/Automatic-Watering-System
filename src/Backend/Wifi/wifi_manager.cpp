@@ -7,6 +7,7 @@ const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 DatabaseConnection awsDB;
 
+// Set up the DNS server for the captive portal
 void WiFiManager::setupDNS()
 {
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
@@ -16,6 +17,7 @@ void WiFiManager::setupDNS()
     Serial.println("Captive Portal IP: " + apIP.toString());
 }
 
+// Set up OTA (Over-the-Air) updates
 void WiFiManager::setupOTA()
 {
     ArduinoOTA.onStart([]()
@@ -48,6 +50,7 @@ void WiFiManager::setupOTA()
     Serial.println("OTA Ready");
 }
 
+// Send a success response for the captive portal
 void WiFiManager::sendCaptivePortalSuccess(const String &contentType, const String &content)
 {
     server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -63,6 +66,7 @@ void WiFiManager::sendCaptivePortalSuccess(const String &contentType, const Stri
     server.send(200, contentType, content);
 }
 
+// Disable the access point and switch to station mode
 void WiFiManager::disableAccessPoint()
 {
     // Ensure WiFi settings persist through disable/enable
@@ -77,14 +81,52 @@ void WiFiManager::disableAccessPoint()
     Serial.println("Access Point disabled and station mode configured for stealth");
 }
 
+// Initialize the WiFi manager
 void WiFiManager::begin()
 {
-    setupAccessPoint();
-    setupDNS();
+    bool connected = false;
+
+    // Check for saved WiFi credentials
+    if (LittleFS.exists("/credentials.json"))
+    {
+        File file = LittleFS.open("/credentials.json", "r");
+        if (file)
+        {
+            StaticJsonDocument<512> creds; // Use StaticJsonDocument
+            DeserializationError error = deserializeJson(creds, file);
+            file.close();
+
+            if (!error)
+            {
+                String ssid = creds["ssid"].as<String>();
+                String password = creds["password"].as<String>();
+
+                connected = connect(ssid, password);
+                if (connected)
+                {
+                    Serial.println("Connected to [" + ssid + "] using saved credentials");
+                }
+            }
+        }
+    }
+
+    // If no saved credentials or connection failed, start AP mode
+    if (!connected)
+    {
+        setupAccessPoint();
+        setupDNS();
+    }
+
+    // Always set up the web server to serve the necessary files
     setupConfigRoutes();
     server.begin();
+    Serial.println("Web server started");
+
+    // Always set up OTA
+    setupOTA();
 }
 
+// Handle client requests
 void WiFiManager::handleClient()
 {
     dnsServer.processNextRequest();
@@ -93,8 +135,42 @@ void WiFiManager::handleClient()
     awsDB.connect();
 }
 
+// Set up the configuration routes for the web server
 void WiFiManager::setupConfigRoutes()
 {
+    // Serve the main HTML page
+    server.on("/", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/wifi_config/index.html", "r");
+        if (!file) {
+            server.send(404, "text/plain", "WiFi configuration page not found");
+            return;
+        }
+        server.streamFile(file, "text/html");
+        file.close(); });
+
+    // Serve the CSS file
+    server.on("/styles.css", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/wifi_config/styles.css", "r");
+        if (!file) {
+            server.send(404, "text/plain", "CSS file not found");
+            return;
+        }
+        server.streamFile(file, "text/css");
+        file.close(); });
+
+    // Serve the JavaScript file
+    server.on("/script.js", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/wifi_config/script.js", "r");
+        if (!file) {
+            server.send(404, "text/plain", "JavaScript file not found");
+            return;
+        }
+        server.streamFile(file, "application/javascript");
+        file.close(); });
+
     // Catch-all handler for captive portal
     server.onNotFound([this]()
                       {
@@ -107,6 +183,7 @@ void WiFiManager::setupConfigRoutes()
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
+    // Handle disabling the access point
     server.on("/disable-ap", HTTP_POST, [this]()
               {
         if (server.hasHeader("User-Agent")) {
@@ -172,6 +249,7 @@ void WiFiManager::setupConfigRoutes()
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
+    // Handle WiFi connection requests
     server.on("/wifi-connect", HTTP_POST, [this]()
               {
         String ssid = server.arg("ssid");
@@ -208,6 +286,7 @@ void WiFiManager::setupConfigRoutes()
         serializeJson(response, jsonResponse);
         server.send(200, "application/json", jsonResponse); });
 
+    // Handle WiFi scan requests
     server.on("/wifi-scan", HTTP_GET, [this]()
               {
         DynamicJsonDocument doc(1024);
@@ -224,38 +303,9 @@ void WiFiManager::setupConfigRoutes()
         String jsonResponse;
         serializeJson(doc, jsonResponse);
         server.send(200, "application/json", jsonResponse); });
-
-    server.on("/", HTTP_GET, [this]()
-              {
-        File file = LittleFS.open("/wifi_config/index.html", "r");
-        if (!file) {
-            server.send(404, "text/plain", "WiFi configuration page not found");
-            return;
-        }
-        server.streamFile(file, "text/html");
-        file.close(); });
-
-    server.on("/styles.css", HTTP_GET, [this]()
-              {
-        File file = LittleFS.open("/wifi_config/styles.css", "r");
-        if (!file) {
-            server.send(404, "text/plain", "CSS file not found");
-            return;
-        }
-        server.streamFile(file, "text/css");
-        file.close(); });
-
-    server.on("/script.js", HTTP_GET, [this]()
-              {
-        File file = LittleFS.open("/wifi_config/script.js", "r");
-        if (!file) {
-            server.send(404, "text/plain", "JavaScript file not found");
-            return;
-        }
-        server.streamFile(file, "application/javascript");
-        file.close(); });
 }
 
+// Connect to a WiFi network
 bool WiFiManager::connect(const String &ssid, const String &password)
 {
     WiFi.mode(WIFI_AP_STA);
@@ -274,6 +324,7 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     return WiFi.status() == WL_CONNECTED;
 }
 
+// Set up the access point
 void WiFiManager::setupAccessPoint()
 {
     WiFi.mode(WIFI_AP);

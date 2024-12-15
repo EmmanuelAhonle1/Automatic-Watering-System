@@ -8,7 +8,7 @@ using namespace std;
 // Function to read the temperature from the soil sensor
 int readTemperature()
 {
-    int temperature;
+    int temperature = 0;
 
     return temperature;
 }
@@ -16,7 +16,7 @@ int readTemperature()
 // Function to read the soil moisture level from the soil sensor
 int readMoisture()
 {
-    int moisture;
+    int moisture = 0;
 
     return moisture;
 }
@@ -25,7 +25,7 @@ int readMoisture()
 int readLight()
 {
     // Implementation needed
-    int light;
+    int light = 0;
 
     return light;
 }
@@ -35,7 +35,7 @@ int readHumidity()
 {
     // Implementation needed
 
-    int humidity;
+    int humidity = 0;
 
     return humidity;
 }
