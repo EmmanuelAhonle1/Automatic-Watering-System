@@ -143,25 +143,4 @@ void DeviceManager::begin()
         deviceName = storedName;
         Serial.println("Using existing name: " + deviceName);
     }
-
-    setupAccessPoint();
-}
-
-void DeviceManager::setupAccessPoint()
-{
-    WiFi.mode(WIFI_AP);
-    bool apStarted = WiFi.softAP(deviceName.c_str());
-
-    if (apStarted)
-    {
-        Serial.println("Access Point Started");
-        Serial.print("Network Name: ");
-        Serial.println(deviceName);
-        Serial.print("IP Address: ");
-        Serial.println(WiFi.softAPIP());
-    }
-    else
-    {
-        Serial.println("Failed to start Access Point");
-    }
 }
