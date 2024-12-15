@@ -2,7 +2,7 @@
 #include <ESP8266WebServer.h>
 #include <ArduinoJson.h>
 #include <ArduinoOTA.h>
-#include "device_manager.hpp"
+#include "../Device/device_manager.hpp"
 #include <DNSServer.h>
 
 class WiFiManager

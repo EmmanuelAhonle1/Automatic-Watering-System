@@ -9,8 +9,8 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "device_manager.hpp"
-#include "Wifi/wifi_manager.hpp"
+#include "Backend/Device/device_manager.hpp"
+#include "Backend/Wifi/wifi_manager.hpp"
 
 ESP8266WebServer server(80);
 DeviceManager deviceManager;

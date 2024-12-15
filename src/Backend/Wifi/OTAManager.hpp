@@ -2,13 +2,13 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <ESP8266mDNS.h>
-#include "device_manager.hpp"
+#include "../Device/device_manager.hpp"
 
 void setupArduinoOTA(void)
 {
 
-    ArduinoOTA.onStart([]()
-                       {
+  ArduinoOTA.onStart([]()
+                     {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
@@ -18,12 +18,12 @@ void setupArduinoOTA(void)
 
         // NOTE: if updating FS this would be the place to unmount FS using FS.end()
     Serial.println("Start updating " + type); });
-    ArduinoOTA.onEnd([]()
-                     { Serial.println("\nEnd"); });
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
-                          { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
-    ArduinoOTA.onError([](ota_error_t error)
-                       {
+  ArduinoOTA.onEnd([]()
+                   { Serial.println("\nEnd"); });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
+                        { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
+  ArduinoOTA.onError([](ota_error_t error)
+                     {
     Serial.printf("Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) {
       Serial.println("Auth Failed");
@@ -36,9 +36,9 @@ void setupArduinoOTA(void)
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
     } });
-    ArduinoOTA.begin();
-    Serial.println("Ready");
-    digitalWrite(LED_BUILTIN, HIGH);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+  ArduinoOTA.begin();
+  Serial.println("Ready");
+  digitalWrite(LED_BUILTIN, HIGH);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 }

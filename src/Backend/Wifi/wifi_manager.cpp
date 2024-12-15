@@ -1,5 +1,6 @@
 #include "wifi_manager.hpp"
 #include <DNSServer.h>
+#include "OTAManager.hpp"
 
 const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
@@ -265,7 +266,8 @@ bool WiFiManager::connect(const String &ssid, const String &password)
         attempts++;
     }
 
-    setupOTA();
+    // setupOTA();
+    setupArduinoOTA();
     return WiFi.status() == WL_CONNECTED;
 }
 
