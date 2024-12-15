@@ -3,10 +3,20 @@
 #include <ctime>
 #include <vector>
 #include <ArduinoJson.h>
+
 #include <MySQL_Connection.h>
+#include <MySQL_Cursor.h>
 
 using namespace std;
 using namespace chrono;
+
+// MySQL server settings
+const char *server_host = "automatic-watering-system.cdq4ye8ggh8i.us-east-1.rds.amazonaws.com"; // Your endpoint URL
+char user[] = "admin";
+char password_mysql[] = "Mighty_Duck1738";
+
+WiFiClient client;
+MySQL_Connection conn((Client *)&client);
 
 class DatabaseConnection
 {
