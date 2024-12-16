@@ -2,10 +2,13 @@
 #include <DNSServer.h>
 #include "OTAManager.hpp"
 #include "../Device/dbConnection.hpp"
-
+#include <Arduino.h>
+#include <string>
+using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 DatabaseConnection awsDB;
+#define LED_BUILTIN 2
 
 // Set up the DNS server for the captive portal
 void WiFiManager::setupDNS()
@@ -52,6 +55,8 @@ void WiFiManager::disableAccessPoint()
 void WiFiManager::begin()
 {
     bool connected = false;
+    Serial.println("on now");
+    delay(1000);
 
     // Check for saved WiFi credentials
     if (LittleFS.exists("/credentials.json"))
@@ -59,7 +64,7 @@ void WiFiManager::begin()
         File file = LittleFS.open("/credentials.json", "r");
         if (file)
         {
-            StaticJsonDocument<512> creds; // Use StaticJsonDocument
+            JsonDocument creds; // Use StaticJsonDocument
             DeserializationError error = deserializeJson(creds, file);
             file.close();
 
@@ -100,6 +105,42 @@ void WiFiManager::handleClient()
     server.handleClient();
     ArduinoOTA.handle();
     awsDB.connect();
+
+    // Check WiFi connection status and attempt to reconnect if disconnected
+    bool savedCredentials = false;
+    // Check for saved WiFi credentials
+    if (LittleFS.exists("/credentials.json"))
+    {
+        File file = LittleFS.open("/credentials.json", "r");
+        if (file)
+        {
+            JsonDocument creds; // Use StaticJsonDocument
+            DeserializationError error = deserializeJson(creds, file);
+            file.close();
+
+            if (!error)
+            {
+                String ssid = creds["ssid"].as<String>();
+                String password = creds["password"].as<String>();
+
+                if (ssid.isEmpty() && password.isEmpty())
+                {
+                    Serial.println("No saved credentials found");
+                }
+                else
+                {
+                    Serial1.println("Saved credentials found");
+                    savedCredentials = true;
+                }
+            }
+        }
+    }
+
+    if (WiFi.status() != WL_CONNECTED && !savedCredentials)
+    {
+        Serial.println("WiFi disconnected. Attempting to reconnect...");
+        reconnectWiFi();
+    }
 }
 
 // Set up the configuration routes for the web server
@@ -282,12 +323,42 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     int attempts = 0;
     while (WiFi.status() != WL_CONNECTED && attempts < 10)
     {
+        Serial.println(".");
         delay(1000);
         attempts++;
     }
 
-    setupArduinoOTA();
+    // setupArduinoOTA();
     return WiFi.status() == WL_CONNECTED;
+}
+
+void WiFiManager::reconnectWiFi()
+{
+    if (LittleFS.exists("/credentials.json"))
+    {
+        File file = LittleFS.open("/credentials.json", "r");
+        if (file)
+        {
+            StaticJsonDocument<512> creds;
+            DeserializationError error = deserializeJson(creds, file);
+            file.close();
+
+            if (!error)
+            {
+                String ssid = creds["ssid"].as<String>();
+                String password = creds["password"].as<String>();
+
+                if (connect(ssid, password))
+                {
+                    Serial.println("Reconnected to WiFi network [" + ssid + "]");
+                }
+                else
+                {
+                    Serial.println("Failed to reconnect to WiFi network [" + ssid + "]");
+                }
+            }
+        }
+    }
 }
 
 // Set up the access point

@@ -16,15 +16,22 @@ ESP8266WebServer server(80);
 DeviceManager deviceManager;
 WiFiManager wifiManager(server, &deviceManager);
 
+#define LED_BUILTIN D4
+
 void setup()
 {
   Serial.begin(115200);
+
+  Serial.println();
 
   if (!LittleFS.begin())
   {
     Serial.println("Failed to mount file system");
     return;
   }
+
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
 
   deviceManager.begin();
   wifiManager.begin();

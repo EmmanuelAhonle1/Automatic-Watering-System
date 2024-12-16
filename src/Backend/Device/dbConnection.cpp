@@ -1,5 +1,6 @@
 #include "dbConnection.hpp"
 #include "../Credentials/credentials.h"
+#include <Esp8266WiFi.h>
 
 DatabaseConnection::DatabaseConnection() : conn((Client *)&client)
 {
@@ -12,9 +13,11 @@ DatabaseConnection::DatabaseConnection() : conn((Client *)&client)
 
 void DatabaseConnection::connect()
 {
+    WiFi.status() == WL_CONNECTED ? digitalWrite(LED_BUILTIN, LOW) : digitalWrite(LED_BUILTIN, HIGH);
+
     if (conn.connect(SERVER_HOST, 3306, USER, PASSWORD))
     {
-        delay(1000);
+        delay(500);
         Serial.println("Connected to MySQL server");
     }
     else

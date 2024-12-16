@@ -129,7 +129,6 @@ void DeviceManager::begin()
 
     // First try to read existing name
     String storedName = readNameFromCredentials();
-
     if (storedName.isEmpty())
     {
         // Only generate and store a new name if no valid name exists

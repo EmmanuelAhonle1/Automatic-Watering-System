@@ -26,6 +26,7 @@ private:
     void setupDNS();
     void sendCaptivePortalSuccess(const String &contentType, const String &content);
     void disableAccessPoint();
+    void reconnectWiFi();
 
 public:
     WiFiManager(ESP8266WebServer &server, DeviceManager *dm)
