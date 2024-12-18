@@ -14,7 +14,7 @@ mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    return "Welcome to the Automatic Watering System API" + " " + app.config['MYSQL_HOST']
+    return "Welcome to the Automatic Watering System API"
 
 @app.route('/plantNode/<mac_address>', methods=['GET'])
 def get_plant(mac_address):
