@@ -1,6 +1,9 @@
 #include "dbConnection.hpp"
-#include "../Credentials/credentials.h"
+// #include "../Credentials/credentials.h"
 #include <Esp8266WiFi.h>
+#define SERVER_HOST "automatic-watering-system.cdq4ye8ggh8i.us-east-1.rds.amazonaws.com"
+#define USER "admin"
+#define PASSWORD "Mighty_Duck1738"
 
 DatabaseConnection::DatabaseConnection() : conn((Client *)&client)
 {

@@ -1,5 +1,5 @@
 -- Humidity Thresholds
-CREATE TABLE IF NOT EXISTS humidity_thresholds (
+CREATE TABLE IF NOT EXISTS `threshold-humidity` (
    humidityThresholdID INT AUTO_INCREMENT,
    threshold_name VARCHAR(50) NOT NULL UNIQUE,
    min_humidity INT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS humidity_thresholds (
    PRIMARY KEY (humidityThresholdID)
 );
 
-INSERT INTO humidity_thresholds (threshold_name, min_humidity, max_humidity, description) VALUES
+INSERT INTO `threshold-humidity` (threshold_name, min_humidity, max_humidity, description) VALUES
    ('Very Low', 0, 30, 'Suitable for cacti and succulents'),
    ('Low', 31, 50, 'Standard indoor humidity'),
    ('Medium', 51, 70, 'Ideal for most houseplants'),

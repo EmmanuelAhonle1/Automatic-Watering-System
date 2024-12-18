@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS plant_nodes (
     plantNodeUUID CHAR(39),      
-    nodeName VARCHAR(14) NOT NULL UNIQUE,
+    nodeName VARCHAR(100) NOT NULL UNIQUE,
     connectedUserUUID CHAR(36) UNIQUE,
     plantSpecies VARCHAR(100),
     wateringFrequencyID INT NOT NULL,
@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS plant_nodes (
     nextWateringTime TIMESTAMP,  
     lastMaintenance TIMESTAMP,   
     notes TEXT,                 
+    macAddress CHAR(17) NOT NULL,              -- Added MAC address field
+    CONSTRAINT valid_mac CHECK (macAddress REGEXP '^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$'), -- Ensure MAC address format
     
     -- Creation/Update tracking
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -38,10 +40,10 @@ CREATE TABLE IF NOT EXISTS plant_nodes (
     
     PRIMARY KEY (plantNodeUUID),
     FOREIGN KEY (wateringFrequencyID) REFERENCES watering_frequencies(frequencyID),
-    FOREIGN KEY (lightThresholdID) REFERENCES light_sensitivity_thresholds(lightThresholdID),
-    FOREIGN KEY (humidityThresholdID) REFERENCES humidity_thresholds(humidityThresholdID),
-    FOREIGN KEY (moistureThresholdID) REFERENCES soil_moisture_thresholds(moistureThresholdID),
-    FOREIGN KEY (temperatureThresholdID) REFERENCES temperature_thresholds(temperatureThresholdID)
+    FOREIGN KEY (lightThresholdID) REFERENCES `threshold-light-sensitivity`(lightThresholdID),
+    FOREIGN KEY (humidityThresholdID) REFERENCES `threshold-humidity`(humidityThresholdID),
+    FOREIGN KEY (moistureThresholdID) REFERENCES `threshold-soil-moisture`(moistureThresholdID),
+    FOREIGN KEY (temperatureThresholdID) REFERENCES `threshold-temperature`(temperatureThresholdID)
 );
 
 -- Updated watering status trigger
@@ -54,7 +56,7 @@ BEGIN
     
     -- Get the minimum moisture threshold
     SELECT min_moisture INTO min_moisture_threshold
-    FROM soil_moisture_thresholds 
+    FROM `threshold-soil-moisture`
     WHERE moistureThresholdID = NEW.moistureThresholdID;
     
     -- If currently not watering and moisture is below threshold
@@ -90,14 +92,14 @@ CREATE TRIGGER update_plant_health
 BEFORE UPDATE ON plant_nodes
 FOR EACH ROW
 BEGIN
-   IF (NEW.lightLevel < (SELECT min_light_level FROM light_sensitivity_thresholds WHERE lightThresholdID = NEW.lightThresholdID)
-       OR NEW.lightLevel > (SELECT max_light_level FROM light_sensitivity_thresholds WHERE lightThresholdID = NEW.lightThresholdID)
-       OR NEW.humidity < (SELECT min_humidity FROM humidity_thresholds WHERE humidityThresholdID = NEW.humidityThresholdID)
-       OR NEW.humidity > (SELECT max_humidity FROM humidity_thresholds WHERE humidityThresholdID = NEW.humidityThresholdID)
-       OR NEW.soilMoisture < (SELECT min_moisture FROM soil_moisture_thresholds WHERE moistureThresholdID = NEW.moistureThresholdID)
-       OR NEW.soilMoisture > (SELECT max_moisture FROM soil_moisture_thresholds WHERE moistureThresholdID = NEW.moistureThresholdID)
-       OR NEW.temperature < (SELECT min_temperature FROM temperature_thresholds WHERE temperatureThresholdID = NEW.temperatureThresholdID)
-       OR NEW.temperature > (SELECT max_temperature FROM temperature_thresholds WHERE temperatureThresholdID = NEW.temperatureThresholdID)) THEN
+   IF (NEW.lightLevel < (SELECT min_light_level FROM `threshold-light-sensitivity` WHERE lightThresholdID = NEW.lightThresholdID)
+       OR NEW.lightLevel > (SELECT max_light_level FROM `threshold-light-sensitivity` WHERE lightThresholdID = NEW.lightThresholdID)
+       OR NEW.humidity < (SELECT min_humidity FROM `threshold-humidity` WHERE humidityThresholdID = NEW.humidityThresholdID)
+       OR NEW.humidity > (SELECT max_humidity FROM `threshold-humidity` WHERE humidityThresholdID = NEW.humidityThresholdID)
+       OR NEW.soilMoisture < (SELECT min_moisture FROM `threshold-soil-moisture` WHERE moistureThresholdID = NEW.moistureThresholdID)
+       OR NEW.soilMoisture > (SELECT max_moisture FROM `threshold-soil-moisture` WHERE moistureThresholdID = NEW.moistureThresholdID)
+       OR NEW.temperature < (SELECT min_temperature FROM `threshold-temperature` WHERE temperatureThresholdID = NEW.temperatureThresholdID)
+       OR NEW.temperature > (SELECT max_temperature FROM `threshold-temperature` WHERE temperatureThresholdID = NEW.temperatureThresholdID)) THEN
        SET NEW.healthStatus = 'Needs Attention';
    ELSE
        SET NEW.healthStatus = 'Healthy';

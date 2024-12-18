@@ -1,7 +1,7 @@
 #include "wifi_manager.hpp"
 #include <DNSServer.h>
 #include "OTAManager.hpp"
-#include "../Device/dbConnection.hpp"
+#include "../Database/dbConnection.hpp"
 #include <Arduino.h>
 #include <string>
 using namespace std;
@@ -321,6 +321,7 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     WiFi.hostname(deviceManager->getName());
 
     int attempts = 0;
+    Serial.println(WiFi.macAddress());
     while (WiFi.status() != WL_CONNECTED && attempts < 10)
     {
         Serial.println(".");
