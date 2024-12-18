@@ -1,19 +1,20 @@
 from flask import Flask, jsonify # type: ignore
 from flask_mysqldb import MySQL # type: ignore
+import os
 
 app = Flask(__name__)
 
 # MySQL configurations
-app.config['MYSQL_HOST'] = 'your_mysql_host'
-app.config['MYSQL_USER'] = 'your_mysql_user'
-app.config['MYSQL_PASSWORD'] = 'your_mysql_password'
-app.config['MYSQL_DB'] = 'your_database_name'
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    return "Welcome to the Automatic Watering System API"
+    return "Welcome to the Automatic Watering System API" + " " + app.config['MYSQL_HOST']
 
 @app.route('/plantNode/<mac_address>', methods=['GET'])
 def get_plant(mac_address):
