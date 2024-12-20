@@ -29,7 +29,7 @@ def get_plant(mac_address):
     try:
         cur = mysql.connection.cursor()
         # Remove the database name from the query since it's specified in MYSQL_DB config
-        cur.execute("SELECT * FROM plantNodes WHERE mac_address = %s", (mac_address,))
+        cur.execute("SELECT * FROM plant_nodes WHERE mac_address = %s", (mac_address,))
         plant = cur.fetchone()
         cur.close()
         
