@@ -14,12 +14,12 @@ mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    return "Welcome to the Automatic Watering System API"
+    return "Welcome to the Automatic Watering System API" + os.getenv('MYSQL_HOST')
 
 @app.route('/plantNode/<mac_address>', methods=['GET'])
 def get_plant(mac_address):
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM plants WHERE mac_address = %s", (mac_address,))
+    cur.execute("SELECT * FROM automatic_watering_system.plantNodes WHERE mac_address = %s", (mac_address,))
     plant = cur.fetchone()
     cur.close()
     if plant:
