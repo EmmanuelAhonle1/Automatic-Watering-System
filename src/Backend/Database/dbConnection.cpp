@@ -75,6 +75,7 @@ string DatabaseConnection::getPlantNodeName()
 
     if (WiFi.status() == WL_CONNECTED)
     {
+        checkConnection();
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc, response.c_str());
 

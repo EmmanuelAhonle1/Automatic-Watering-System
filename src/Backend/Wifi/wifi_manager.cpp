@@ -105,6 +105,7 @@ void WiFiManager::handleClient()
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
+    awsDB.checkConnection();
     // awsDB.checkConnection();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
