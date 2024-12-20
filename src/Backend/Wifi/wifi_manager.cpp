@@ -214,6 +214,7 @@ void WiFiManager::setupConfigRoutes()
             sendCaptivePortalSuccess("text/plain", "Success");
         }
 
+        delay(1000); // Add delay to allow frontend time to redirect
         disableAccessPoint(); });
 
     // Captive portal detection endpoints
