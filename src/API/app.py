@@ -13,40 +13,36 @@ app.config['MYSQL_DB'] = "automatic_watering_system"  # Make sure this is your a
 
 mysql = MySQL(app)
 
+@app.route('/')
+def index():
+    try:
+        cur = mysql.connection.cursor()
+        # Test the connection
+        cur.execute('SELECT 1')
+        cur.close()
+        return "Database connection successful! Welcome to the Automatic Watering System API"
+    except Exception as e:
+        return jsonify({'error': f'Database connection failed: {str(e)}'}), 500
+
 @app.route('/plantNode/<mac_address>', methods=['GET'])
 def get_plant(mac_address):
-    cur = None
     try:
-        # Use DictCursor instead of regular cursor
-        cur = mysql.connection.cursor(dictionary=True)
-        
-        query = """
-            SELECT macAddress, nodeName 
-            FROM automatic_watering_system.plant_nodes 
-            WHERE macAddress = %s
-        """
-        cur.execute(query, (mac_address,))
+        cur = mysql.connection.cursor()
+        # Remove the database name from the query since it's specified in MYSQL_DB config
+        cur.execute("SELECT macAddress, nodeName FROM automatic_watering_system.plant_nodes WHERE macAddress = %s", (mac_address,))
         plant = cur.fetchone()
+        cur.close()
         
         if plant:
-            result = {
-                'mac_address': plant['macAddress'],  # Access by column name
-                'name': plant['nodeName']           # Access by column name
-            }
-            mysql.connection.commit()
-            return jsonify(result)
+            return jsonify({
+                'mac_address': plant[0],
+                'name': plant[1]
+            })
         else:
             return jsonify({'error': 'Plant not found'}), 404
             
-    except mysql.connector.Error as db_err:
-        app.logger.error(f"Database error: {db_err}")
-        return jsonify({'error': 'Database connection error'}), 500
     except Exception as e:
-        app.logger.error(f"Server error: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        if cur:
-            cur.close()
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
