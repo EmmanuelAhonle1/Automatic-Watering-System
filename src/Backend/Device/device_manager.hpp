@@ -11,11 +11,11 @@ private:
     String deviceName;
     String generateDeviceName();
     String readNameFromCredentials();
-    bool updateStoredName(const String &newName);
 
 public:
     void begin();
     void setupAccessPoint();
+    bool updateStoredName(const String &newName);
     String getName() { return deviceName; }
     bool regenerateName()
     {

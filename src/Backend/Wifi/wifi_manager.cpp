@@ -4,6 +4,7 @@
 #include "../Database/dbConnection.hpp"
 #include <Arduino.h>
 #include <string>
+#include "../Device/device_manager.hpp"
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
@@ -104,7 +105,7 @@ void WiFiManager::handleClient()
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
-    awsDB.connect();
+    // awsDB.checkConnection();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;
@@ -329,6 +330,14 @@ bool WiFiManager::connect(const String &ssid, const String &password)
         attempts++;
     }
 
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        // Call updateStoredName when connected to WiFi
+        DeviceManager deviceManager;
+        string dbPlantName = awsDB.getPlantNodeName();
+        deviceManager.updateStoredName(dbPlantName.c_str());
+    }
+
     // setupArduinoOTA();
     return WiFi.status() == WL_CONNECTED;
 }
@@ -352,6 +361,11 @@ void WiFiManager::reconnectWiFi()
                 if (connect(ssid, password))
                 {
                     Serial.println("Reconnected to WiFi network [" + ssid + "]");
+
+                    // Call updateStoredName when reconnected to WiFi
+                    DeviceManager deviceManager;
+                    string dbPlantName = awsDB.getPlantNodeName();
+                    deviceManager.updateStoredName(dbPlantName.c_str());
                 }
                 else
                 {
