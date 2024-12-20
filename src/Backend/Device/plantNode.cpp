@@ -5,8 +5,7 @@
 #include <ArduinoJson.h>
 
 #include <Ethernet.h>
-#include <MySQL_Connection.h>
-#include <MySQL_Cursor.h>
+
 #include "../Credentials/credentials.h"
 using namespace std;
 

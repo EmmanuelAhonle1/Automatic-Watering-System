@@ -5,20 +5,25 @@
 #include <vector>
 #include <unordered_map>
 #include <WiFiClient.h>
-#include <MySQL_Connection.h>
-#include <MySQL_Cursor.h>
+
+using namespace std;
 
 class DatabaseConnection
 {
 private:
     // Connection settings
-    std::string host;
-    std::string user;
-    std::string password;
-    std::string database;
+    string host;
+    string user;
+    string password;
+    string api_url;
     WiFiClient client;
-    MySQL_Connection conn;
-    MySQL_Cursor *cur;
+
+    /**
+     * @brief Send an HTTP GET request
+     * @param url The URL to send the request to.
+     * @return string The response from the server.
+     */
+    string sendGetRequest(const string &url);
 
 public:
     /**
@@ -29,23 +34,24 @@ public:
 
     /**
      * @brief Connect to the MySQL server
-     * Establishes a connection to the MySQL server using the provided credentials.
+     * Checks if the device is connected to the MySQL server.
      */
-    void connect();
-
-    /**
-     * @brief Disconnect from the MySQL server
-     * Cleans up the cursor and disconnects from the MySQL server.
-     */
-    void disconnect();
+    bool checkConnection();
 
     /**
      * @brief Execute a query on the MySQL server
      * Executes the provided SQL query and returns the result as a vector of unordered maps.
      * @param query The SQL query to execute.
-     * @return std::vector<std::unordered_map<std::string, std::string>> The result of the query.
+     * @return vector<unordered_map<string, string>> The result of the query.
      */
-    std::vector<std::unordered_map<std::string, std::string>> executeQuery(std::string query);
+    vector<unordered_map<string, string>> executeQuery(string query);
+
+    /**
+     * @brief Get the name of a plant node from the API based on its MAC address
+     * Retrieves the name of a plant node with the given MAC address.
+     * @return string The name of the plant node.
+     */
+    string getPlantNodeName();
 };
 
 #endif // DATABASE_CONNECTION_HPP
