@@ -58,7 +58,7 @@ def check_connection():
         # Test the connection
         cur.execute("SELECT 1")
         cur.close()
-        return jsonify({"message": "Database connection successful!"})
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": f"Database connection failed: {str(e)}"}), 500
 
