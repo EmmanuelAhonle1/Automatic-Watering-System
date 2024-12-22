@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <string>
 #include "../Device/device_manager.hpp"
+#include "../DB Query Creator/dbQueryCreator.hpp"
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
@@ -109,6 +110,8 @@ void WiFiManager::handleClient()
     server.handleClient();
     ArduinoOTA.handle();
     awsDB.checkConnection();
+    SQLQueryBuilder queryBuilder("plantNode");
+    queryBuilder.pingDatabase();
     // awsDB.checkConnection();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
@@ -269,7 +272,7 @@ void WiFiManager::setupConfigRoutes()
         String ssid = server.arg("ssid");
         String password = server.arg("password");
         
-        DynamicJsonDocument response(256);
+        JsonDocument response;
         
         if (ssid.length() == 0) {
             response["success"] = false;
@@ -283,7 +286,7 @@ void WiFiManager::setupConfigRoutes()
                 // Save credentials
                 File file = LittleFS.open("/credentials.json", "w");
                 if (file) {
-                    DynamicJsonDocument creds(512);
+                    JsonDocument creds;
                     creds["ssid"] = ssid;
                     creds["password"] = password;
                     creds["name"] = deviceManager->getName();
@@ -303,7 +306,7 @@ void WiFiManager::setupConfigRoutes()
     // Handle WiFi scan requests
     server.on("/wifi-scan", HTTP_GET, [this]()
               {
-        DynamicJsonDocument doc(1024);
+        JsonDocument doc;
         JsonArray array = doc.to<JsonArray>();
         
         int n = WiFi.scanNetworks();
@@ -354,7 +357,7 @@ void WiFiManager::reconnectWiFi()
         File file = LittleFS.open("/credentials.json", "r");
         if (file)
         {
-            StaticJsonDocument<512> creds;
+            JsonDocument creds;
             DeserializationError error = deserializeJson(creds, file);
             file.close();
 

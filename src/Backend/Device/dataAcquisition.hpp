@@ -1,6 +1,8 @@
 #ifndef DATA_ACQUISITION_HPP
 #define DATA_ACQUISITION_HPP
 
+#define DEBUG_DATA_ACQUISITION // Enable debug mode
+
 #include "Pinouts.hpp"
 #include <Arduino.h>
 #include <DHT.h> // Include DHT sensor library

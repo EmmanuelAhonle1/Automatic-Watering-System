@@ -10,7 +10,6 @@ using namespace std;
 DatabaseConnection::DatabaseConnection()
 {
     // MySQL server settings
-    host = SERVER_HOST;
     user = USER;
     password = PASSWORD;
     api_url = API_URL;
@@ -63,11 +62,6 @@ string DatabaseConnection::sendGetRequest(const string &url)
     return payload;
 }
 
-string DatabaseConnection::sendPostRequest(unordered_map<string, string> params)
-{
-    return "";
-}
-
 string DatabaseConnection::getPlantNodeName()
 {
     string url = api_url + "plantNode/" + WiFi.macAddress().c_str();
@@ -82,7 +76,7 @@ string DatabaseConnection::getPlantNodeName()
     if (WiFi.status() == WL_CONNECTED)
     {
         checkConnection();
-        DynamicJsonDocument doc(1024);
+        JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response.c_str());
 
         if (error)
@@ -105,7 +99,7 @@ string DatabaseConnection::getPlantNodeName()
                 return "";
             }
 
-            StaticJsonDocument<512> val;
+            JsonDocument val;
             DeserializationError error = deserializeJson(val, file);
             // Read entire file content into string
             file.close();
