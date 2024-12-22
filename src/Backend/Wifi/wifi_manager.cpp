@@ -11,6 +11,9 @@ IPAddress apIP(192, 168, 4, 1);
 DatabaseConnection awsDB;
 #define LED_BUILTIN 2
 
+WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
+    : server(server), deviceManager(deviceManager) {}
+
 // Set up the DNS server for the captive portal
 void WiFiManager::setupDNS()
 {

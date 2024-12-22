@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include <Arduino.h>
 using namespace std;
+#include <LittleFS.h>
 
 DatabaseConnection::DatabaseConnection()
 {
@@ -62,6 +63,11 @@ string DatabaseConnection::sendGetRequest(const string &url)
     return payload;
 }
 
+string DatabaseConnection::sendPostRequest(unordered_map<string, string> params)
+{
+    return "";
+}
+
 string DatabaseConnection::getPlantNodeName()
 {
     string url = api_url + "plantNode/" + WiFi.macAddress().c_str();
@@ -91,9 +97,29 @@ string DatabaseConnection::getPlantNodeName()
         }
         else
         {
-            Serial.printf("Plant not found: %s\n", response.c_str());
+            // Read existing file
+            File file = LittleFS.open("/credentials.json", "r");
+            if (!file)
+            {
+                Serial.println("Failed to open credentials file");
+                return "";
+            }
+
+            StaticJsonDocument<512> val;
+            DeserializationError error = deserializeJson(val, file);
+            // Read entire file content into string
+            file.close();
+            if (error)
+            {
+                Serial.println("Failed to parse credentials file");
+                return "";
+            }
+
+            string plantName = val["name"].as<string>();
+            Serial.printf("Plant not found, creating new node: %s\n", plantName.c_str());
+
+            return plantName;
         }
     }
-
     return "";
 }
