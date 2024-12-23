@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config["MYSQL_HOST"] = (
     "automatic-watering-system.cdq4ye8ggh8i.us-east-1.rds.amazonaws.com"
 )
-app.config["MYSQL_USER"] = "admin"
-app.config["MYSQL_PASSWORD"] = "Mighty_Duck1738"
+app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
+app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
 app.config["MYSQL_DB"] = (
     "automatic_watering_system"  # Make sure this is your actual database name
 )
