@@ -33,12 +33,6 @@ public:
     DatabaseConnection();
 
     /**
-     * @brief Connect to the MySQL server
-     * Checks if the device is connected to the MySQL server.
-     */
-    bool checkConnection();
-
-    /**
      * @brief Execute a query on the MySQL server
      * Executes the provided SQL query and returns the result as a vector of unordered maps.
      * @param query The SQL query to execute.

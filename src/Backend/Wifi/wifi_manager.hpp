@@ -18,6 +18,7 @@ public:
     bool connect(const String &ssid, const String &password);
     void reconnectWiFi();
     void disableAccessPoint();
+    void pingWiFi(); // Declare pingWiFi method
 
 private:
     void setupAccessPoint();

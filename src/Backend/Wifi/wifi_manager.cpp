@@ -103,16 +103,19 @@ void WiFiManager::begin()
     setupArduinoOTA();
 }
 
+void WiFiManager::pingWiFi()
+{
+    WiFi.status() == WL_CONNECTED ? digitalWrite(LED_BUILTIN, LOW) : digitalWrite(LED_BUILTIN, HIGH);
+}
+
 // Handle client requests
 void WiFiManager::handleClient()
 {
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
-    awsDB.checkConnection();
-    SQLQueryBuilder queryBuilder("plantNode");
-    queryBuilder.pingDatabase();
-    // awsDB.checkConnection();
+    pingWiFi();
+    pingDatabase();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;

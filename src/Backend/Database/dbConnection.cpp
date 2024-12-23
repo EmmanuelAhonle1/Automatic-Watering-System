@@ -15,12 +15,6 @@ DatabaseConnection::DatabaseConnection()
     api_url = API_URL;
 }
 
-bool DatabaseConnection::checkConnection()
-{
-    WiFi.status() == WL_CONNECTED ? digitalWrite(LED_BUILTIN, LOW) : digitalWrite(LED_BUILTIN, HIGH);
-    return WiFi.status() == WL_CONNECTED;
-}
-
 vector<unordered_map<string, string>> DatabaseConnection::executeQuery(string query)
 {
     vector<unordered_map<string, string>> result = vector<unordered_map<string, string>>();
@@ -33,7 +27,6 @@ string DatabaseConnection::sendGetRequest(const string &url)
     WiFiClientSecure client;
     HTTPClient http;
     string payload = "";
-    checkConnection();
 
     client.setInsecure(); // Required for HTTPS
 
@@ -75,7 +68,6 @@ string DatabaseConnection::getPlantNodeName()
 
     if (WiFi.status() == WL_CONNECTED)
     {
-        checkConnection();
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, response.c_str());
 

@@ -6,6 +6,65 @@
 #include <string.h>
 
 using namespace std;
+
+// Shared sendGetRequest function
+string sendGetRequest(const string &url)
+{
+    WiFiClientSecure client;
+    HTTPClient http;
+    string payload = "";
+
+    client.setInsecure(); // Required for HTTPS
+
+    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
+    {
+        http.setTimeout(10000);
+        client.setTimeout(10000);
+
+        int httpCode = http.GET();
+        if (httpCode > 0)
+        {
+            payload = http.getString().c_str();
+#ifdef DEBUG_DBQC
+            Serial.println(payload.c_str());
+#endif
+        }
+        else
+        {
+            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+        http.end();
+    }
+
+    return payload;
+}
+
+bool pingDatabase()
+{
+    string baseUrl = API_URL;
+    string url = baseUrl + "/checkConnection";
+    string response = sendGetRequest(url);
+
+    JsonDocument doc;
+
+    deserializeJson(doc, response.c_str());
+
+    if (doc["error"])
+    {
+        Serial.println("Database connection failed");
+        return false;
+    }
+    else
+    {
+
+#ifdef DEBUG_DBQC
+        Serial.println("Database connection successful");
+        Serial.println(response.c_str());
+#endif
+    }
+    return true;
+}
+
 // URLQueryBuilder class implementation
 URLQueryBuilder::URLQueryBuilder(const std::string &user, const std::string &password)
     : user(user), password(password) {}
@@ -81,39 +140,6 @@ std::string URLQueryBuilder::build() const
     return url.str();
 }
 
-string URLQueryBuilder::sendGetRequest(const string &url)
-{
-    WiFiClientSecure client;
-    HTTPClient http;
-    string payload = "";
-
-    client.setInsecure(); // Required for HTTPS
-
-    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
-    {
-        http.setTimeout(10000);
-        client.setTimeout(10000);
-
-        int httpCode = http.GET();
-        if (httpCode > 0)
-        {
-            payload = http.getString().c_str();
-            Serial.println(payload.c_str());
-        }
-        else
-        {
-            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-        http.end();
-    }
-    else
-    {
-        Serial.println("Unable to connect");
-    }
-
-    return payload;
-}
-
 // SQLQueryBuilder class implementation
 SQLQueryBuilder::SQLQueryBuilder(const std::string &tableName) : tableName(tableName) {}
 
@@ -181,100 +207,4 @@ std::pair<std::string, std::vector<std::string>> SQLQueryBuilder::buildQuery(
     }
 
     return {sql.str(), values};
-}
-
-string SQLQueryBuilder::sendGetRequest(const string &url)
-{
-    WiFiClientSecure client;
-    HTTPClient http;
-    string payload = "";
-
-    client.setInsecure(); // Required for HTTPS
-
-    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
-    {
-        http.setTimeout(10000);
-        client.setTimeout(10000);
-
-        int httpCode = http.GET();
-        if (httpCode > 0)
-        {
-            payload = http.getString().c_str();
-#ifdef DEBUG_DBQC
-            Serial.println(payload.c_str());
-#endif
-        }
-        else
-        {
-            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-        http.end();
-    }
-    else
-    {
-        Serial.println("Unable to connect");
-    }
-
-    return payload;
-}
-
-bool SQLQueryBuilder::pingDatabase()
-{
-    string baseUrl = API_URL;
-    string url = baseUrl + "/checkConnection";
-    string response = sendGetRequest(url);
-
-    JsonDocument doc;
-
-    deserializeJson(doc, response.c_str());
-
-    if (doc["error"])
-    {
-        Serial.println("Database connection failed");
-        digitalWrite(LED_BUILTIN, HIGH);
-        return false;
-    }
-    else
-    {
-
-#ifdef DEBUG_DBQC
-        Serial.println("Database connection successful");
-        Serial.println(response.c_str());
-#endif
-        digitalWrite(LED_BUILTIN, LOW);
-    }
-    return true;
-}
-
-string pingDatabase(const string &url)
-{
-    WiFiClientSecure client;
-    HTTPClient http;
-    string payload = "";
-
-    client.setInsecure(); // Required for HTTPS
-
-    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
-    {
-        http.setTimeout(10000);
-        client.setTimeout(10000);
-
-        int httpCode = http.GET();
-        if (httpCode > 0)
-        {
-            payload = http.getString().c_str();
-            Serial.println(payload.c_str());
-        }
-        else
-        {
-            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-        http.end();
-    }
-    else
-    {
-        Serial.println("Unable to connect");
-    }
-
-    return payload;
 }

@@ -1,7 +1,7 @@
 #ifndef DB_QUERY_CREATOR_HPP
 #define DB_QUERY_CREATOR_HPP
 
-// #define DEBUG_DBQC // Enable debug mode
+#define DEBUG_DBQC // Enable debug mode
 
 #include <string>
 #include <vector>
@@ -20,7 +20,6 @@ public:
     void addParameters(const std::string &key, const std::vector<std::string> &values);
     void setReturnFields(const std::vector<std::string> &fields);
     std::string build() const;
-    string sendGetRequest(const string &url); // Added sendGetRequest method
 
 private:
     std::string baseUrl = API_URL;
@@ -38,12 +37,14 @@ public:
     std::pair<std::string, std::vector<std::string>> buildQuery(
         const std::map<std::string, std::vector<std::string>> &parameters,
         const std::vector<std::string> &returnFields);
-    string sendGetRequest(const string &url); // Added sendGetRequest method
-    bool pingDatabase();                      // Declare pingDatabase function
 
 private:
     std::string tableName;
     static std::string sanitizeIdentifier(const std::string &identifier); // Sanitize identifier method
 };
+
+// Shared sendGetRequest function
+string sendGetRequest(const string &url);
+bool pingDatabase(); // Declare pingDatabase function
 
 #endif // DB_QUERY_CREATOR_HPP
