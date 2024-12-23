@@ -6,14 +6,10 @@ app = Flask(__name__)
 
 # MySQL configurations - using your provided credentials
 # (but please change these ASAP for security!)
-app.config["MYSQL_HOST"] = (
-    "automatic-watering-system.cdq4ye8ggh8i.us-east-1.rds.amazonaws.com"
-)
+app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
 app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
 app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
-app.config["MYSQL_DB"] = (
-    "automatic_watering_system"  # Make sure this is your actual database name
-)
+app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
 
 mysql = MySQL(app)
 
