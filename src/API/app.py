@@ -1,4 +1,4 @@
-from flask import Flask, jsonify  # type: ignore
+from flask import Flask, jsonify, request  # type: ignore
 from flask_mysqldb import MySQL  # type: ignore
 import os
 
@@ -57,6 +57,63 @@ def check_connection():
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": f"Database connection failed: {str(e)}"}), 500
+
+
+@app.route("/plantNode/", methods=["GET"])
+def query_plant():
+    try:
+        # Get search parameters
+        mac_address = request.args.get("macAddress")
+        node_name = request.args.get("nodeName")
+
+        # Get threshold types (handles multiple values)
+        thresholds = request.args.getlist("thresholds[]")
+
+        # Get and validate requested return fields
+        fields = [
+            f.strip() for f in request.args.get("fields", "").split(",") if f.strip()
+        ]
+
+        # Build SQL query dynamically
+        query = "SELECT {} FROM automatic_watering_system.plant_nodes WHERE 1=1"
+        params = []
+
+        # Add requested fields or select all
+        select_fields = "*" if not fields else ", ".join(fields)
+        query = query.format(select_fields)
+
+        # Add search conditions
+        if mac_address:
+            query += " AND macAddress = %s"
+            params.append(mac_address)
+        if node_name:
+            query += " AND nodeName = %s"
+            params.append(node_name)
+        if thresholds:
+            query += " AND threshold_type IN ({})".format(
+                ",".join(["%s"] * len(thresholds))
+            )
+            params.extend(thresholds)
+
+        cur = mysql.connection.cursor()
+        cur.execute(query, tuple(params))
+        results = cur.fetchall()
+
+        # Format response based on requested fields
+        if fields:
+            response = [
+                {fields[i]: row[i] for i in range(len(fields))} for row in results
+            ]
+        else:
+            response = [
+                dict(zip([col[0] for col in cur.description], row)) for row in results
+            ]
+
+        cur.close()
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
 if __name__ == "__main__":

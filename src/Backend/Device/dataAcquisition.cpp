@@ -100,5 +100,22 @@ unordered_map<string, int> readAllSensors()
     sensorData["humidity"] = humidity;
     sensorData["batterylevel"] = batteryLevel;
 
+#ifdef DEBUG_DATA_ACQUISITION
+    temperature = 75;
+    Serial.print("Temperature: " + String(temperature) + "°F");
+
+    moisture = 50;
+    Serial.print("Moisture: " + String(moisture) + "%");
+
+    lightPercentage = 50;
+    Serial.print("Light: " + String(lightPercentage) + "%");
+
+    humidity = 50;
+    Serial.print("Humidity: " + String(humidity) + "%");
+
+    batteryLevel = 50;
+    Serial.print("Battery Level: " + String(batteryLevel) + "%");
+#endif
+
     return sensorData;
 }

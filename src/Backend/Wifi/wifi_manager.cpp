@@ -9,7 +9,11 @@
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
+
+#ifdef USING_DBCONNECTION
 DatabaseConnection awsDB;
+#endif
+
 #define LED_BUILTIN 2
 
 WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
@@ -343,10 +347,14 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 
     if (WiFi.status() == WL_CONNECTED)
     {
+
+#ifdef USING_DBCONNECTION
         // Call updateStoredName when connected to WiFi
         DeviceManager deviceManager;
         string dbPlantName = awsDB.getPlantNodeName();
         deviceManager.updateStoredName(dbPlantName.c_str());
+
+#endif
     }
 
     // setupArduinoOTA();
@@ -373,10 +381,13 @@ void WiFiManager::reconnectWiFi()
                 {
                     Serial.println("Reconnected to WiFi network [" + ssid + "]");
 
+#ifdef USING_DBCONNECTION
                     // Call updateStoredName when reconnected to WiFi
                     DeviceManager deviceManager;
                     string dbPlantName = awsDB.getPlantNodeName();
                     deviceManager.updateStoredName(dbPlantName.c_str());
+
+#endif
                 }
                 else
                 {

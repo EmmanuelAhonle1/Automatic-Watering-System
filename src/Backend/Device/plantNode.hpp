@@ -1,6 +1,7 @@
 #ifndef PLANTNODE_HPP
 #define PLANTNODE_HPP
 
+#define DEBUG_PLANT_NODE
 #include <string>
 #include <vector>
 

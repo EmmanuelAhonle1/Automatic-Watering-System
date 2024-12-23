@@ -1,6 +1,20 @@
 #ifndef WIFI_MANAGER_HPP
 #define WIFI_MANAGER_HPP
 
+#define DEBUG_WIFI_MANAGER
+
+#define USING_DBCONNECTION
+// #define USING_DBQC
+
+// Mutual exclusion check
+#if defined(USING_DBCONNECTION) && defined(USING_DBQC)
+#error "Cannot define both USING_DBCONNECTION and USING_DBQC. Choose one."
+#endif
+
+#if !defined(USING_DBCONNECTION) && !defined(USING_DBQC)
+#error "Must define either USING_DBCONNECTION or USING_DBQC"
+#endif
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>

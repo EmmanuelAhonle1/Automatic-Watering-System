@@ -1,6 +1,7 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
+#define DEBUG_DEVICE_MANAGER
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>

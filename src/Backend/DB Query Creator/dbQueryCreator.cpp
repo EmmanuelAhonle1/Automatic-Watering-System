@@ -7,7 +7,6 @@
 
 using namespace std;
 
-// Shared sendGetRequest function
 string sendGetRequest(const string &url)
 {
     WiFiClientSecure client;
@@ -138,73 +137,4 @@ std::string URLQueryBuilder::build() const
     }
 
     return url.str();
-}
-
-// SQLQueryBuilder class implementation
-SQLQueryBuilder::SQLQueryBuilder(const std::string &tableName) : tableName(tableName) {}
-
-std::string SQLQueryBuilder::sanitizeIdentifier(const std::string &identifier)
-{
-    std::string sanitized;
-    std::copy_if(identifier.begin(), identifier.end(),
-                 std::back_inserter(sanitized),
-                 [](char c)
-                 { return isalnum(c) || c == '_'; });
-    return sanitized;
-}
-
-std::pair<std::string, std::vector<std::string>> SQLQueryBuilder::buildQuery(
-    const std::map<std::string, std::vector<std::string>> &parameters,
-    const std::vector<std::string> &returnFields)
-{
-    std::ostringstream sql;
-    std::vector<std::string> values;
-
-    sql << "SELECT ";
-    if (returnFields.empty())
-    {
-        sql << "*";
-    }
-    else
-    {
-        for (size_t i = 0; i < returnFields.size(); ++i)
-        {
-            if (i > 0)
-                sql << ", ";
-            sql << sanitizeIdentifier(returnFields[i]);
-        }
-    }
-
-    sql << " FROM " << sanitizeIdentifier(tableName);
-
-    if (!parameters.empty())
-    {
-        sql << " WHERE 1=1";
-
-        for (const auto &param : parameters)
-        {
-            const std::string &key = sanitizeIdentifier(param.first);
-            const auto &paramValues = param.second;
-
-            if (paramValues.size() == 1)
-            {
-                sql << " AND " << key << " = ?";
-                values.push_back(paramValues[0]);
-            }
-            else if (paramValues.size() > 1)
-            {
-                sql << " AND " << key << " IN (";
-                for (size_t i = 0; i < paramValues.size(); ++i)
-                {
-                    if (i > 0)
-                        sql << ",";
-                    sql << "?";
-                    values.push_back(paramValues[i]);
-                }
-                sql << ")";
-            }
-        }
-    }
-
-    return {sql.str(), values};
 }
