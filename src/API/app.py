@@ -59,7 +59,7 @@ def check_connection():
         return jsonify({"error": f"Database connection failed: {str(e)}"}), 500
 
 
-@app.route("/plantNode/", methods=["GET"])
+@app.route("/plantNode", methods=["GET"])
 def query_plant():
     try:
         # Get search parameters
