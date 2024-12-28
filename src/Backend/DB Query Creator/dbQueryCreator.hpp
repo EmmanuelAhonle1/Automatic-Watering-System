@@ -49,7 +49,7 @@ public:
      */
     void setReturnFields(const std::vector<std::string> &fields);
 
-    /**+
+    /**
      * @brief Build the complete URL with parameters and return fields.
      *
      * @return std::string The complete URL.
@@ -75,10 +75,20 @@ private:
 /**
  * @brief Send an HTTP GET request.
  *
- * @param url The URL to send the request to.
+ * @param endpoint The endpoint to send the request to.
+ * @param query The query string to append to the URL.
  * @return string The response from the server.
  */
-string sendGetRequest(const string &url);
+string sendGetRequest(const string &endpoint, const string &query);
+
+/**
+ * @brief Send an HTTP POST request.
+ *
+ * @param endpoint The endpoint to send the request to.
+ * @param query The query string to append to the URL.
+ * @return string The response from the server.
+ */
+string sendPostRequest(const string &endpoint, const string &query);
 
 /**
  * @brief Ping the database to check the connection.

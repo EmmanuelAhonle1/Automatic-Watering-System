@@ -6,60 +6,18 @@
 #include <Arduino.h>
 using namespace std;
 #include <LittleFS.h>
+#include "../DB Query Creator/dbQueryCreator.hpp"
 
-DatabaseConnection::DatabaseConnection()
+string getPlantNodeName()
 {
-    // MySQL server settings
-    user = USER;
-    password = PASSWORD;
-    api_url = API_URL;
-}
+    URLQueryBuilder queryBuilder(USER, PASSWORD);
 
-vector<unordered_map<string, string>> DatabaseConnection::executeQuery(string query)
-{
-    vector<unordered_map<string, string>> result = vector<unordered_map<string, string>>();
+    string urlEndpoint = "/plantNode/select";
 
-    return result;
-}
+    queryBuilder.addParameter("macAddress", WiFi.macAddress().c_str());
+    queryBuilder.setReturnFields({"nodeName"});
 
-string DatabaseConnection::sendGetRequest(const string &url)
-{
-    WiFiClientSecure client;
-    HTTPClient http;
-    string payload = "";
-
-    client.setInsecure(); // Required for HTTPS
-
-    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
-    {
-        http.setTimeout(10000);
-        client.setTimeout(10000);
-
-        int httpCode = http.GET();
-        if (httpCode > 0)
-        {
-            payload = http.getString().c_str();
-            Serial.println(payload.c_str());
-        }
-        else
-        {
-            Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-        http.end();
-    }
-    else
-    {
-        Serial.println("Unable to connect");
-    }
-
-    return payload;
-}
-
-string DatabaseConnection::getPlantNodeName()
-{
-    string url = api_url + "plantNode/" + WiFi.macAddress().c_str();
-    string response = sendGetRequest(url);
-
+    string response = sendGetRequest(urlEndpoint, queryBuilder.build());
     if (response.empty() && WiFi.status() == WL_CONNECTED)
     {
         Serial.println("Empty response received");
@@ -79,32 +37,7 @@ string DatabaseConnection::getPlantNodeName()
 
         if (!doc["error"])
         {
-            return doc["name"].as<string>();
-        }
-        else
-        {
-            // Read existing file
-            File file = LittleFS.open("/credentials.json", "r");
-            if (!file)
-            {
-                Serial.println("Failed to open credentials file");
-                return "";
-            }
-
-            JsonDocument val;
-            DeserializationError error = deserializeJson(val, file);
-            // Read entire file content into string
-            file.close();
-            if (error)
-            {
-                Serial.println("Failed to parse credentials file");
-                return "";
-            }
-
-            string plantName = val["name"].as<string>();
-            Serial.printf("Plant not found, creating new node: %s\n", plantName.c_str());
-
-            return plantName;
+            return doc["nodeName"].as<string>();
         }
     }
     return "";

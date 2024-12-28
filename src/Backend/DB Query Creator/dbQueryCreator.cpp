@@ -7,11 +7,13 @@
 
 using namespace std;
 
-string sendGetRequest(const string &url)
+string sendGetRequest(const string &endpoint, const string &query)
 {
     WiFiClientSecure client;
     HTTPClient http;
     string payload = "";
+
+    string url = string(API_URL) + endpoint + "?" + query;
 
     client.setInsecure(); // Required for HTTPS
 
@@ -38,11 +40,45 @@ string sendGetRequest(const string &url)
     return payload;
 }
 
+string sendPostRequest(const string &endpoint, const string &query)
+{
+    WiFiClientSecure client;
+    HTTPClient http;
+    string payload = "";
+
+    string url = string(API_URL) + endpoint;
+
+    client.setInsecure(); // Required for HTTPS
+
+    if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
+    {
+        http.setTimeout(10000);
+        client.setTimeout(10000);
+
+        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        int httpCode = http.POST(query.c_str());
+        if (httpCode > 0)
+        {
+            payload = http.getString().c_str();
+#ifdef DEBUG_DBQC
+            Serial.println(payload.c_str());
+#endif
+        }
+        else
+        {
+            Serial.printf("POST request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+        http.end();
+    }
+
+    return payload;
+}
+
 bool pingDatabase()
 {
-    string baseUrl = API_URL;
-    string url = baseUrl + "/checkConnection";
-    string response = sendGetRequest(url);
+    string endpoint = "/checkConnection";
+    string query = "";
+    string response = sendGetRequest(endpoint, query);
 
     JsonDocument doc;
 

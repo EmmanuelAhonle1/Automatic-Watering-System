@@ -60,7 +60,7 @@ def check_connection():
 
 
 @app.route("/plantNode/select", methods=["GET"])
-def query_plant():
+def select_plant():
     try:
         # Get search parameters
         mac_address = request.args.get("macAddress")
@@ -111,6 +111,30 @@ def query_plant():
 
         cur.close()
         return jsonify(response)
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+# TODO: Add /plantNode/insert endpoint here
+@app.route("/plantNode/insert", methods=["POST"])
+def insert_plant():
+    try:
+        # Get request data
+        data = request.json
+
+        # Validate required fields
+        if "macAddress" not in data or "nodeName" not in data:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        # Build and execute SQL query
+        query = "INSERT INTO automatic_watering_system.plant_nodes (macAddress, nodeName) VALUES (%s, %s)"
+        cur = mysql.connection.cursor()
+        cur.execute(query, (data["macAddress"], data["nodeName"]))
+        mysql.connection.commit()
+        cur.close()
+
+        return jsonify({"success": True})
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500

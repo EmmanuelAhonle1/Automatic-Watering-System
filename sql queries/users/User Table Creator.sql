@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    userUUID CHAR(39),
+    userUUID CHAR(36),
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     passwordHash VARCHAR(255) NOT NULL,   -- For storing hashed passwords
