@@ -90,11 +90,4 @@ string sendGetRequest(const string &endpoint, const string &query);
  */
 string sendPostRequest(const string &endpoint, const string &query);
 
-/**
- * @brief Ping the database to check the connection.
- *
- * @return bool True if the connection is successful, false otherwise.
- */
-bool pingDatabase();
-
 #endif // DB_QUERY_CREATOR_HPP

@@ -6,12 +6,12 @@
 #include <string>
 #include "../Device/device_manager.hpp"
 #include "../DB Query Creator/dbQueryCreator.hpp"
+#include "../Plant Node/PlantNode.hpp"
+
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
-
 #ifdef USING_DBCONNECTION
-DatabaseConnection awsDB;
 #endif
 
 #define LED_BUILTIN 2
@@ -119,7 +119,7 @@ void WiFiManager::handleClient()
     server.handleClient();
     ArduinoOTA.handle();
     pingWiFi();
-    pingDatabase();
+    // pingDatabase();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;
@@ -296,7 +296,7 @@ void WiFiManager::setupConfigRoutes()
                     JsonDocument creds;
                     creds["ssid"] = ssid;
                     creds["password"] = password;
-                    creds["name"] = deviceManager->getName();
+                    creds["nodeName"] = deviceManager->getSSID();
                     serializeJson(creds, file);
                     file.close();
                 }
@@ -334,10 +334,9 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 {
     WiFi.mode(WIFI_AP_STA);
     WiFi.begin(ssid.c_str(), password.c_str());
-    WiFi.hostname(deviceManager->getName());
+    WiFi.hostname(deviceManager->getSSID());
 
     int attempts = 0;
-    Serial.println(WiFi.macAddress());
     while (WiFi.status() != WL_CONNECTED && attempts < 10)
     {
         Serial.println(".");
@@ -347,17 +346,12 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 
     if (WiFi.status() == WL_CONNECTED)
     {
-
-#ifdef USING_DBCONNECTION
-        // Call updateStoredName when connected to WiFi
-        DeviceManager deviceManager;
-        string dbPlantName = awsDB.getPlantNodeName();
-        deviceManager.updateStoredName(dbPlantName.c_str());
-
-#endif
+        // TODO: Update stored name
+        delay(500);
+        JsonDocument response = getPlantNodeSettings();
+        deviceManager->updateAllCredentials(response);
     }
 
-    // setupArduinoOTA();
     return WiFi.status() == WL_CONNECTED;
 }
 
@@ -380,14 +374,6 @@ void WiFiManager::reconnectWiFi()
                 if (connect(ssid, password))
                 {
                     Serial.println("Reconnected to WiFi network [" + ssid + "]");
-
-#ifdef USING_DBCONNECTION
-                    // Call updateStoredName when reconnected to WiFi
-                    DeviceManager deviceManager;
-                    string dbPlantName = awsDB.getPlantNodeName();
-                    deviceManager.updateStoredName(dbPlantName.c_str());
-
-#endif
                 }
                 else
                 {
@@ -399,23 +385,46 @@ void WiFiManager::reconnectWiFi()
 }
 
 // Set up the access point
-void WiFiManager::setupAccessPoint()
+bool WiFiManager::setupAccessPoint()
 {
-    WiFi.mode(WIFI_AP);
-    WiFi.hostname(deviceManager->getName());
-    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    bool apStarted = WiFi.softAP(deviceManager->getName().c_str());
+    // Force disconnect from any existing connection
+    WiFi.disconnect();
+    delay(100);
 
-    if (apStarted)
+    // Set mode explicitly to AP
+    WiFi.mode(WIFI_AP);
+    delay(100);
+
+    // Configure AP settings
+    IPAddress apIP(192, 168, 4, 1);
+    IPAddress netMsk(255, 255, 255, 0);
+
+    // Configure network
+    WiFi.softAPConfig(apIP, apIP, netMsk);
+
+    // Start AP with generated name
+    String apName = deviceManager->getSSID();
+    if (apName.isEmpty())
     {
-        Serial.println("Access Point Started");
-        Serial.print("Network Name: ");
-        Serial.println(deviceManager->getName());
-        Serial.print("IP Address: ");
-        Serial.println(apIP.toString());
+        apName = deviceManager->getDeviceName();
+    }
+
+    // Start AP with no password
+    bool success = WiFi.softAP(apName.c_str());
+
+    if (success)
+    {
+        // Setup DNS to capture all requests
+        dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+        dnsServer.start(53, "*", apIP);
+
+        Serial.println("AP Started: " + apName);
+        Serial.println("AP IP: " + WiFi.softAPIP().toString());
     }
     else
     {
-        Serial.println("Failed to start Access Point");
+        Serial.println("AP Setup Failed!");
     }
+
+    return success;
 }

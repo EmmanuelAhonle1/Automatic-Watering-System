@@ -1,35 +1,63 @@
 #ifndef DEVICE_MANAGER_HPP
 #define DEVICE_MANAGER_HPP
 
-#define DEBUG_DEVICE_MANAGER
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
 class DeviceManager
 {
-private:
-    String deviceName;
+public:
+    /**
+     * @brief Generate a random device name.
+     *
+     * @return String The generated device name.
+     */
     String generateDeviceName();
+
+    /**
+     * @brief Update the stored device name in the credentials file.
+     *
+     * @param newName The new device name.
+     * @return bool True if the update was successful, false otherwise.
+     */
+    bool updateStoredName(const String &newName);
+
+    /**
+     * @brief Read the device name from the credentials file.
+     *
+     * @return String The stored device name.
+     */
     String readNameFromCredentials();
 
-public:
+    /**
+     * @brief Initialize the device manager.
+     */
     void begin();
-    void setupAccessPoint();
-    bool updateStoredName(const String &newName);
-    String getName() { return deviceName; }
-    bool regenerateName()
-    {
-        String newName = generateDeviceName();
-        if (updateStoredName(newName))
-        {
-            deviceName = newName;
-            return true;
-        }
-        return false;
-    }
-};
 
-extern DeviceManager deviceManager;
+    /**
+     * @brief Update all credentials in the credentials file.
+     *
+     * @param creds The JSON document containing the credentials to update.
+     */
+    void updateAllCredentials(JsonDocument creds);
+
+    /**
+     * @brief Get the SSID from the credentials file.
+     *
+     * @return String The stored SSID.
+     */
+    String getSSID();
+
+    /**
+     * @brief Get the device name.
+     *
+     * @return String The device name.
+     */
+    String getDeviceName() { return deviceName; };
+
+private:
+    String deviceName;
+};
 
 #endif // DEVICE_MANAGER_HPP

@@ -38,7 +38,7 @@ bool DeviceManager::updateStoredName(const String &newName)
     {
         // If file doesn't exist, create new one with just the name
         DynamicJsonDocument doc(512);
-        doc["name"] = newName;
+        doc["nodeName"] = newName;
 
         File file = LittleFS.open("/credentials.json", "w");
         if (!file)
@@ -71,7 +71,7 @@ bool DeviceManager::updateStoredName(const String &newName)
     }
 
     // Update name in JSON while preserving other fields
-    doc["name"] = newName;
+    doc["nodeName"] = newName;
 
     // Write updated JSON back to file
     file = LittleFS.open("/credentials.json", "w");
@@ -113,11 +113,21 @@ String DeviceManager::readNameFromCredentials()
         return "";
     }
 
-    if (doc.containsKey("name"))
+    if (doc.containsKey("nodeName"))
     {
-        String storedName = doc["name"].as<String>();
-        Serial.println("Found stored name: " + storedName);
-        return storedName;
+        String storedName;
+
+        if (doc["nodeName"].as<String>().isEmpty())
+        {
+
+            Serial.println("No stored name found");
+        }
+        else
+        {
+            storedName = doc["nodeName"].as<String>();
+            Serial.println("Found stored name: " + storedName);
+            return storedName;
+        }
     }
 
     return "";
@@ -142,4 +152,75 @@ void DeviceManager::begin()
         deviceName = storedName;
         Serial.println("Using existing name: " + deviceName);
     }
+}
+
+void DeviceManager::updateAllCredentials(JsonDocument creds)
+{
+    JsonDocument doc;
+    if (LittleFS.exists("/credentials.json"))
+    {
+        File file = LittleFS.open("/credentials.json", "r");
+        if (file)
+        {
+            DeserializationError error = deserializeJson(doc, file);
+            file.close();
+
+            if (error)
+            {
+                Serial.println("Failed to parse credentials file");
+                return;
+            }
+        }
+    }
+    JsonDocument newDoc = creds[0];
+    doc["nodeName"] = newDoc["nodeName"];
+    doc["plantNodeUUID"] = newDoc["plantNodeUUID"];
+    doc["connectedUserUUID"] = newDoc["connectedUserUUID"];
+    doc["plantSpecies"] = newDoc["plantSpecies"];
+    doc["wateringFrequencyID"] = newDoc["wateringFrequencyID"];
+    doc["lightThresholdID"] = newDoc["lightThresholdID"];
+    doc["humidityThresholdID"] = newDoc["humidityThresholdID"];
+    doc["moistureThresholdID"] = newDoc["moistureThresholdID"];
+    doc["temperatureThresholdID"] = newDoc["temperatureThresholdID"];
+
+    File file = LittleFS.open("/credentials.json", "w");
+    serializeJson(doc, file);
+    file.close();
+
+    Serial.println("Updated credentials file");
+}
+
+String DeviceManager::getSSID()
+{
+    if (!LittleFS.exists("/credentials.json"))
+    {
+        Serial.println("No credentials file found");
+        return "";
+    }
+
+    File file = LittleFS.open("/credentials.json", "r");
+    if (!file)
+    {
+        Serial.println("Failed to open credentials file");
+        return "";
+    }
+
+    StaticJsonDocument<512> doc;
+    DeserializationError error = deserializeJson(doc, file);
+    file.close();
+
+    if (error)
+    {
+        Serial.println("Failed to parse credentials file");
+        return "";
+    }
+
+    if (doc.containsKey("ssid"))
+    {
+        String ssid = doc["ssid"].as<String>();
+        Serial.println("Found stored SSID: " + ssid);
+        return ssid;
+    }
+
+    return "";
 }

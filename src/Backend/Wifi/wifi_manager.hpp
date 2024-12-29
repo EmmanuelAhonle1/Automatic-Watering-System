@@ -35,7 +35,7 @@ public:
     void pingWiFi(); // Declare pingWiFi method
 
 private:
-    void setupAccessPoint();
+    bool setupAccessPoint();
     void setupDNS();
     void setupConfigRoutes();
     void sendCaptivePortalSuccess(const String &contentType, const String &content);

@@ -27,7 +27,7 @@ string sendGetRequest(const string &endpoint, const string &query)
         {
             payload = http.getString().c_str();
 #ifdef DEBUG_DBQC
-            Serial.println(payload.c_str());
+            Serial.println("Response from Get Request: " + String(payload.c_str()));
 #endif
         }
         else
@@ -72,32 +72,6 @@ string sendPostRequest(const string &endpoint, const string &query)
     }
 
     return payload;
-}
-
-bool pingDatabase()
-{
-    string endpoint = "/checkConnection";
-    string query = "";
-    string response = sendGetRequest(endpoint, query);
-
-    JsonDocument doc;
-
-    deserializeJson(doc, response.c_str());
-
-    if (doc["error"])
-    {
-        Serial.println("Database connection failed");
-        return false;
-    }
-    else
-    {
-
-#ifdef DEBUG_DBQC
-        Serial.println("Database connection successful");
-        Serial.println(response.c_str());
-#endif
-    }
-    return true;
 }
 
 // URLQueryBuilder class implementation
