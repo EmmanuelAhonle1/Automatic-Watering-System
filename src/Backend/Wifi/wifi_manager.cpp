@@ -161,8 +161,16 @@ void WiFiManager::handleClient()
 // Set up the configuration routes for the web server
 void WiFiManager::setupConfigRoutes()
 {
-    // Serve the main HTML page
+
+    // ----------------- WiFi Configuration -----------------
+    // Redirect root URL to /wifi_config/index.html
     server.on("/", HTTP_GET, [this]()
+              {
+        server.sendHeader("Location", "/wifi_config/index.html", true);
+        server.send(302, "text/plain", ""); });
+
+    // Serve the wifi_config HTML file
+    server.on("/wifi_config/index.html", HTTP_GET, [this]()
               {
         File file = LittleFS.open("/wifi_config/index.html", "r");
         if (!file) {
@@ -172,19 +180,8 @@ void WiFiManager::setupConfigRoutes()
         server.streamFile(file, "text/html");
         file.close(); });
 
-    // Serve the CSS file
-    server.on("/styles.css", HTTP_GET, [this]()
-              {
-        File file = LittleFS.open("/wifi_config/styles.css", "r");
-        if (!file) {
-            server.send(404, "text/plain", "CSS file not found");
-            return;
-        }
-        server.streamFile(file, "text/css");
-        file.close(); });
-
-    // Serve the JavaScript file
-    server.on("/script.js", HTTP_GET, [this]()
+    // Serve the wifi_config JavaScript file
+    server.on("/wifi_config/script.js", HTTP_GET, [this]()
               {
         File file = LittleFS.open("/wifi_config/script.js", "r");
         if (!file) {
@@ -194,6 +191,88 @@ void WiFiManager::setupConfigRoutes()
         server.streamFile(file, "application/javascript");
         file.close(); });
 
+    // Serve the wifi_config CSS file
+    server.on("/wifi_config/styles.css", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/wifi_config/styles.css", "r");
+        if (!file) {
+            server.send(404, "text/plain", "CSS file not found");
+            return;
+        }
+        server.streamFile(file, "text/css");
+        file.close(); });
+
+    // ----------------- Intro Login -----------------
+
+    // Serve the intro_login HTML file
+    server.on("/intro_login/index.html", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/intro_login/index.html", "r");
+        if (!file) {
+            server.send(404, "text/plain", "Intro login page not found");
+            return;
+        }
+        server.streamFile(file, "text/html");
+        file.close(); });
+
+    // Serve the intro_login JavaScript file
+    server.on("/intro_login/script.js", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/intro_login/script.js", "r");
+        if (!file) {
+            server.send(404, "text/plain", "JavaScript file not found");
+            return;
+        }
+        server.streamFile(file, "application/javascript");
+        file.close(); });
+
+    // Serve the intro_login CSS file
+    server.on("/intro_login/styles.css", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/intro_login/styles.css", "r");
+        if (!file) {
+            server.send(404, "text/plain", "CSS file not found");
+            return;
+        }
+        server.streamFile(file, "text/css");
+        file.close(); });
+
+    // ----------------- Plant Node Registration -----------------
+
+    // Serve the plant_node_registration HTML file
+    server.on("/plant_node_registration/index.html", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/plant_node_registration/index.html", "r");
+        if (!file) {
+            server.send(404, "text/plain", "Plant node registration page not found");
+            return;
+        }
+        server.streamFile(file, "text/html");
+        file.close(); });
+
+    // Serve the plant_node_registration JavaScript file
+    server.on("/plant_node_registration/script.js", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/plant_node_registration/script.js", "r");
+        if (!file) {
+            server.send(404, "text/plain", "JavaScript file not found");
+            return;
+        }
+        server.streamFile(file, "application/javascript");
+        file.close(); });
+
+    // Serve the plant_node_registration CSS file
+    server.on("/plant_node_registration/styles.css", HTTP_GET, [this]()
+              {
+        File file = LittleFS.open("/plant_node_registration/styles.css", "r");
+        if (!file) {
+            server.send(404, "text/plain", "CSS file not found");
+            return;
+        }
+        server.streamFile(file, "text/css");
+        file.close(); });
+
+    // ----------------- Captive Portal Handler -----------------
     // Catch-all handler for captive portal
     server.onNotFound([this]()
                       {

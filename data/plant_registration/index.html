@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plant Registration</title>
+    <link rel="stylesheet" href="/plant_registration/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="registration-box">
+        <h2>Register Plant Node</h2>
+        <form id="registrationForm" onsubmit="return validateForm(event)">
+          <div class="input-group">
+            <label for="nodeName">Node Name</label>
+            <input type="text" id="nodeName" name="nodeName" required />
+            <span class="error" id="nodeNameError"></span>
+          </div>
+
+          <div class="input-group">
+            <label for="plantSpecies">Plant Species</label>
+            <input type="text" id="plantSpecies" name="plantSpecies" required />
+            <span class="error" id="plantSpeciesError"></span>
+          </div>
+
+          <div class="input-group">
+            <label for="wateringFrequency">Watering Frequency</label>
+            <select
+              id="wateringFrequency"
+              name="wateringFrequency"
+              onchange="toggleCustomFrequency()"
+            >
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Biweekly</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input
+              type="number"
+              id="customFrequency"
+              name="customFrequency"
+              placeholder="Enter days"
+              style="display: none"
+            />
+            <span class="error" id="wateringFrequencyError"></span>
+          </div>
+
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+    <script src="/plant_registration/script.js"></script>
+  </body>
+</html>

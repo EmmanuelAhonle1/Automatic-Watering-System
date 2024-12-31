@@ -78,7 +78,7 @@ document.getElementById("wifi-form").onsubmit = async function (e) {
         // Redirect to the new device IP
         if (data.ip) {
           setTimeout(() => {
-            window.location.href = `http://${data.ip}`;
+            window.location.href = `http://${data.ip}/intro_login/index.html`;
           }, 3000);
         } else {
           throw new Error("No IP address received from device");
