@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Plant Registration</title>
-    <link rel="stylesheet" href="/plant_registration/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
@@ -19,7 +19,25 @@
 
           <div class="input-group">
             <label for="plantSpecies">Plant Species</label>
-            <input type="text" id="plantSpecies" name="plantSpecies" required />
+            <select
+              id="plantSpecies"
+              name="plantSpecies"
+              onchange="updateSettings()"
+            >
+              <option value="monstera">Monstera</option>
+              <option value="snake_plant">Snake Plant</option>
+              <option value="peace_lily">Peace Lily</option>
+              <option value="pothos">Pothos</option>
+              <option value="succulent">Succulent</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input
+              type="text"
+              id="customSpecies"
+              name="customSpecies"
+              placeholder="Enter custom species"
+              style="display: none"
+            />
             <span class="error" id="plantSpeciesError"></span>
           </div>
 
@@ -29,12 +47,7 @@
               id="wateringFrequency"
               name="wateringFrequency"
               onchange="toggleCustomFrequency()"
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Biweekly</option>
-              <option value="custom">Custom</option>
-            </select>
+            ></select>
             <input
               type="number"
               id="customFrequency"
@@ -45,10 +58,37 @@
             <span class="error" id="wateringFrequencyError"></span>
           </div>
 
+          <div class="input-group">
+            <label for="thresholdHumidity">Humidity Requirements</label>
+            <select id="thresholdHumidity" name="thresholdHumidity"></select>
+            <span class="error" id="thresholdHumidityError"></span>
+          </div>
+
+          <div class="input-group">
+            <label for="thresholdLight">Light Sensitivity</label>
+            <select id="thresholdLight" name="thresholdLight"></select>
+            <span class="error" id="thresholdLightError"></span>
+          </div>
+
+          <div class="input-group">
+            <label for="thresholdMoisture">Soil Moisture</label>
+            <select id="thresholdMoisture" name="thresholdMoisture"></select>
+            <span class="error" id="thresholdMoistureError"></span>
+          </div>
+
+          <div class="input-group">
+            <label for="thresholdTemperature">Temperature</label>
+            <select
+              id="thresholdTemperature"
+              name="thresholdTemperature"
+            ></select>
+            <span class="error" id="thresholdTemperatureError"></span>
+          </div>
+
           <button type="submit">Register</button>
         </form>
       </div>
     </div>
-    <script src="/plant_registration/script.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>

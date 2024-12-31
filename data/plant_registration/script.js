@@ -1,39 +1,39 @@
 // Default settings for different plant species
 const plantDefaults = {
   monstera: {
-    wateringFrequency: "3",
-    lightThreshold: "2500",
-    humidityThreshold: "60",
-    moistureThreshold: "40",
-    temperatureThreshold: "22",
+    wateringFrequency: "5", // Weekly
+    thresholdLight: "3", // Bright Indirect
+    thresholdHumidity: "4", // High
+    thresholdMoisture: "4", // Moist
+    thresholdTemperature: "2", // Moderate
   },
   snake_plant: {
-    wateringFrequency: "14",
-    lightThreshold: "1000",
-    humidityThreshold: "40",
-    moistureThreshold: "20",
-    temperatureThreshold: "20",
+    wateringFrequency: "6", // Biweekly
+    thresholdLight: "2", // Medium Light
+    thresholdHumidity: "2", // Low
+    thresholdMoisture: "2", // Dry
+    thresholdTemperature: "2", // Moderate
   },
   peace_lily: {
-    wateringFrequency: "7",
-    lightThreshold: "1000",
-    humidityThreshold: "50",
-    moistureThreshold: "40",
-    temperatureThreshold: "20",
+    wateringFrequency: "5", // Weekly
+    thresholdLight: "3", // Bright Indirect
+    thresholdHumidity: "4", // High
+    thresholdMoisture: "4", // Moist
+    thresholdTemperature: "2", // Moderate
   },
   pothos: {
-    wateringFrequency: "7",
-    lightThreshold: "1000",
-    humidityThreshold: "50",
-    moistureThreshold: "30",
-    temperatureThreshold: "20",
+    wateringFrequency: "5", // Weekly
+    thresholdLight: "3", // Bright Indirect
+    thresholdHumidity: "3", // Medium
+    thresholdMoisture: "3", // Medium
+    thresholdTemperature: "2", // Moderate
   },
   succulent: {
-    wateringFrequency: "14",
-    lightThreshold: "5000",
-    humidityThreshold: "40",
-    moistureThreshold: "20",
-    temperatureThreshold: "24",
+    wateringFrequency: "6", // Biweekly
+    thresholdLight: "5", // Full Sun
+    thresholdHumidity: "2", // Low
+    thresholdMoisture: "2", // Dry
+    thresholdTemperature: "3", // Warm
   },
 };
 
@@ -51,11 +51,58 @@ function loadSavedSettings() {
   }
 }
 
-// Auto-fill settings based on plant species
-document
-  .getElementById("plantSpecies")
-  .addEventListener("change", function (e) {
-    const species = e.target.value;
+function loadOptions(id, endpoint) {
+  const select = document.querySelector(id);
+
+  fetch(endpoint)
+    .then((response) => response.json())
+    .then((data) => {
+      const sortedArr = data.sort((a, b) => {
+        return a.id - b.id;
+      });
+      console.log(sortedArr);
+
+      // Populate the select element with sorted options
+      sortedArr.forEach((element) => {
+        select.add(new Option(element.name, element.id));
+      });
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
+
+(function loadAllOptions() {
+  console.log("hello");
+  loadOptions(
+    "#wateringFrequency",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/wifiConfig/retrieveWateringFrequencies"
+  );
+  loadOptions(
+    "#thresholdHumidity",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/wifiConfig/retrieveHumidityThresholds"
+  );
+  loadOptions(
+    "#thresholdLight",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/wifiConfig/retrieveLightThresholds"
+  );
+  loadOptions(
+    "#thresholdMoisture",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/wifiConfig/retrieveMoistureThresholds"
+  );
+  loadOptions(
+    "#thresholdTemperature",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/wifiConfig/retrieveTemperatureThresholds"
+  );
+})();
+
+// Update settings based on plant species
+function updateSettings() {
+  const species = document.getElementById("plantSpecies").value;
+  if (species === "custom") {
+    document.getElementById("customSpecies").style.display = "block";
+  } else {
+    document.getElementById("customSpecies").style.display = "none";
     if (species && plantDefaults[species]) {
       const defaults = plantDefaults[species];
       Object.keys(defaults).forEach((key) => {
@@ -65,7 +112,8 @@ document
         }
       });
     }
-  });
+  }
+}
 
 // Save settings
 function saveSettings(event) {
@@ -73,12 +121,15 @@ function saveSettings(event) {
 
   const settings = {
     nodeName: document.getElementById("nodeName").value,
-    plantSpecies: document.getElementById("plantSpecies").value,
+    plantSpecies:
+      document.getElementById("plantSpecies").value === "custom"
+        ? document.getElementById("customSpecies").value
+        : document.getElementById("plantSpecies").value,
     wateringFrequency: document.getElementById("wateringFrequency").value,
-    lightThreshold: document.getElementById("lightThreshold").value,
-    humidityThreshold: document.getElementById("humidityThreshold").value,
-    moistureThreshold: document.getElementById("moistureThreshold").value,
-    temperatureThreshold: document.getElementById("temperatureThreshold").value,
+    thresholdLight: document.getElementById("thresholdLight").value,
+    thresholdHumidity: document.getElementById("thresholdHumidity").value,
+    thresholdMoisture: document.getElementById("thresholdMoisture").value,
+    thresholdTemperature: document.getElementById("thresholdTemperature").value,
   };
 
   // Validate all fields are filled
@@ -159,6 +210,7 @@ function validateForm(event) {
 
     // Simulate registration success
     alert("Plant node registered successfully!");
+    // TODO: Add function for calling the API to register the plant node; replace simulation
 
     // Clear form
     document.getElementById("registrationForm").reset();
@@ -199,3 +251,18 @@ document
       document.getElementById("wateringFrequencyError").textContent = "";
     }
   });
+
+function toggleCustomSpecies() {
+  const plantSpecies = document.getElementById("plantSpecies").value;
+  const customSpeciesInput = document.getElementById("customSpecies");
+  if (plantSpecies === "custom") {
+    customSpeciesInput.style.display = "block";
+  } else {
+    customSpeciesInput.style.display = "none";
+    customSpeciesInput.value = ""; // Clear custom species input
+  }
+}
+
+document
+  .getElementById("plantSpecies")
+  .addEventListener("change", updateSettings);

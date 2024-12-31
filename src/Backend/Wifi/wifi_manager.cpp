@@ -425,10 +425,12 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 
     if (WiFi.status() == WL_CONNECTED)
     {
-        // TODO: Update stored name
         delay(500);
         JsonDocument response = getPlantNodeSettings();
-        deviceManager->updateAllCredentials(response);
+        if (!response.isNull())
+        {
+            deviceManager->updateAllCredentials(response);
+        }
     }
 
     return WiFi.status() == WL_CONNECTED;
