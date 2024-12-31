@@ -118,8 +118,8 @@ def select_plant():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-@app.route("/plantNode/insert", methods=["POST"])
-def insert_plant():
+@app.route("/plantNode/newPlantNode", methods=["POST"])
+def new_plant_node():
     try:
         # Get request data
         data = request.json
@@ -222,6 +222,70 @@ def retrieve_humidity_thresholds():
 
 
 # TODO: Create login route
+@app.route("/users/login", methods=["POST"])
+def login():
+    try:
+        # Get request data
+        data = request.json
+
+        # Validate required fields
+        if "username" not in data or "password" not in data:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        # Build and execute SQL query
+        query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
+        cur = mysql.connection.cursor()
+        cur.execute(query, (data["username"], data["password"]))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"error": "Invalid credentials"}), 401
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+@app.route("/users/createUser", methods=["POST"])
+def create_user():
+
+    # Get request data
+    data = request.json
+
+    # Build and execute SQL query
+    username = data.get("username")
+    password = data.get("password")
+    email = data.get("email")
+    phone_number = data.get("phone_number")
+    first_name = data.get("firstName")
+    last_name = data.get("lastName")
+    preferred_temperature_unit = data.get("preferredTemperatureUnit")
+
+    query = """INSERT INTO automatic_watering_system.users 
+                (username, password, email, phone_number, firstName, lastName, preferredTemperatureUnit) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            query,
+            (
+                username,
+                password,
+                email,
+                phone_number,
+                first_name,
+                last_name,
+                preferred_temperature_unit,
+            ),
+        )
+        mysql.connection.commit()
+        cur.close()
+        return jsonify({"message": "User added successfully"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
