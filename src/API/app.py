@@ -258,7 +258,7 @@ def create_user():
     username = data.get("username")
     password = data.get("password")
     email = data.get("email")
-    phone_number = data.get("phone_number")
+    phone_number = data.get("phoneNumber")
     first_name = data.get("firstName")
     last_name = data.get("lastName")
     preferred_temperature_unit = data.get("preferredTemperatureUnit")
