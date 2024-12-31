@@ -140,5 +140,91 @@ def insert_plant():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
+"""
+TODO: Add /plantNode/update endpoint here
+- This endpoint should update the nodeName of a plant node with a given macAddress
+"""
+
+
+@app.route("/wifiConfig/retrieveWateringFrequencies", methods=["GET"])
+def retrieve_watering_frequencies():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "SELECT frequencyID, frequency_name FROM automatic_watering_system.watering_frequencies"
+        )
+        frequencies = cur.fetchall()
+        cur.close()
+
+        return jsonify([{"id": f[0], "name": f[1]} for f in frequencies])
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+@app.route("/wifiConfig/retrieveTemperatureThresholds", methods=["GET"])
+def retrieve_temperature_thresholds():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "SELECT temperatureThresholdID, threshold_name FROM automatic_watering_system.`threshold-temperature`"
+        )
+        thresholds = cur.fetchall()
+        cur.close()
+
+        return jsonify([{"id": t[0], "name": t[1]} for t in thresholds])
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+@app.route("/wifiConfig/retrieveMoistureThresholds", methods=["GET"])
+def retrieve_moisture_thresholds():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "SELECT moistureThresholdID, threshold_name FROM automatic_watering_system.`threshold-soil-moisture`"
+        )
+        thresholds = cur.fetchall()
+        cur.close()
+
+        return jsonify([{"id": t[0], "name": t[1]} for t in thresholds])
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+@app.route("/wifiConfig/retrieveLightThresholds", methods=["GET"])
+def retrieve_light_thresholds():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "SELECT lightThresholdID, threshold_name FROM automatic_watering_system.`threshold-light-sensitivity`"
+        )
+        thresholds = cur.fetchall()
+        cur.close()
+
+        return jsonify([{"id": t[0], "name": t[1]} for t in thresholds])
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+@app.route("/wifiConfig/retrieveHumidityThresholds", methods=["GET"])
+def retrieve_humidity_thresholds():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "SELECT humidityThresholdID, threshold_name FROM automatic_watering_system.`threshold-humidity`"
+        )
+        thresholds = cur.fetchall()
+        cur.close()
+
+        return jsonify([{"id": t[0], "name": t[1]} for t in thresholds])
+
+    except Exception as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
