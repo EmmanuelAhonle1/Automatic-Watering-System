@@ -116,7 +116,6 @@ def select_plant():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-# TODO: Add /plantNode/insert endpoint here
 @app.route("/plantNode/insert", methods=["POST"])
 def insert_plant():
     try:
@@ -138,12 +137,6 @@ def insert_plant():
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
-
-
-"""
-TODO: Add /plantNode/update endpoint here
-- This endpoint should update the nodeName of a plant node with a given macAddress
-"""
 
 
 @app.route("/wifiConfig/retrieveWateringFrequencies", methods=["GET"])
@@ -224,6 +217,9 @@ def retrieve_humidity_thresholds():
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+
+# TODO: Create login route
 
 
 if __name__ == "__main__":
