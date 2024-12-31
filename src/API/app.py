@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request  # type: ignore
 from flask_mysqldb import MySQL  # type: ignore
 import os
+from flask_cors import CORS  # type: ignore
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 # MySQL configurations - using your provided credentials
 # (but please change these ASAP for security!)
