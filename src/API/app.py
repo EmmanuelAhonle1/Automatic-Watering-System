@@ -264,7 +264,7 @@ def create_user():
     preferred_temperature_unit = data.get("preferredTemperatureUnit")
 
     query = """INSERT INTO automatic_watering_system.users 
-                (username, password, email, phone_number, firstName, lastName, preferredTemperatureUnit) 
+                (username, password, email, phoneNumber, firstName, lastName, preferredTemperatureUnit) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 
     try:
