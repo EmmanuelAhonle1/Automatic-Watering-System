@@ -307,12 +307,23 @@ def login():
 def verify_user():
     try:
         # Add debug logging
-        print("All cookies:", request.cookies)
-        print("Headers:", dict(request.headers))
-        logging.info("Cookies: %s", request.cookies)
-        username_cookie = request.cookies.get("username")
-        logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
+        logging.info(
+            "All cookies: %s", dict(request.cookies)
+        )  # Convert to dict for better visibility
+        # or
+        logging.info(
+            "All cookies - raw format: %s", request.cookies.items()
+        )  # Show all items
+        # or for even more detail
+        logging.info(
+            "Cookies detailed: %s",
+            {key: request.cookies.get(key) for key in request.cookies.keys()},
+        )
 
+        print("Headers:", dict(request.headers))
+        username_cookie = request.cookies.get("username")
+
+        logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
         if not username_cookie:
             return (
                 jsonify(
