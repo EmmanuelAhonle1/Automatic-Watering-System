@@ -305,6 +305,14 @@ def login():
 def verify_user():
     try:
         # Assuming verification is done via a token or other means
+
+        cookies = request.cookies
+
+        userCookie = cookies.get("username")
+        logging.info(f"Received cookie: {userCookie}")
+        if not userCookie:
+            return jsonify({"error": "Missing required cookie"}), 400
+
         return jsonify({"success": True, "message": "User verified"}), 200
 
     except Exception as e:
