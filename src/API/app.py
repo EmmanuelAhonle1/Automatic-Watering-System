@@ -4,6 +4,11 @@ import os
 from flask_cors import CORS  # type: ignore
 import logging
 
+# Set up logging at the top of your app.py
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 app = Flask(__name__)
 
 # Updated CORS configuration
@@ -304,7 +309,7 @@ def verify_user():
         # Add debug logging
         print("All cookies:", request.cookies)
         print("Headers:", dict(request.headers))
-
+        logging.info("Cookies: %s", request.cookies)
         username_cookie = request.cookies.get("username")
         logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
 
