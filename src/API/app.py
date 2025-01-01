@@ -318,6 +318,9 @@ def login():
                     samesite="Strict",
                     max_age=7 * 24 * 60 * 60,  # 7 days
                 )
+                logging.info(
+                    "Set-Cookie header: " + str(response.headers.get("Set-Cookie"))
+                )
                 return response, 200
             return jsonify({"error": "Invalid credentials"}), 401
 
