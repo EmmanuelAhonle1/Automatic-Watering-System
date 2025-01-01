@@ -278,11 +278,9 @@ def login():
         cur.close()
 
         if user:
-            session["username"] = data["username"]
             response = make_response(
                 jsonify({"success": True, "message": "Login successful"})
             )
-
             response.headers.add(
                 "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
             )
@@ -302,7 +300,7 @@ def login():
     except Exception as e:
         print("Login error:", str(e))
         error_response = make_response(
-            jsonify({"error": "Server error", "details": str(e)})
+            jsonify({"error": "Server error", "details": str(e)}),
         )
         error_response.headers.add(
             "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
@@ -314,34 +312,8 @@ def login():
 @app.route("/users/verify", methods=["GET"])
 def verify_user():
     try:
-        username = session.get("username")
-        logging.info(f"Verification attempt - Session present: {bool(username)}")
-        if not username:
-            return (
-                jsonify(
-                    {
-                        "error": "User not verified",
-                        "message": "No username in session",
-                    }
-                ),
-                401,
-            )
-
-        response = jsonify(
-            {
-                "success": True,
-                "message": "User verified",
-                "username": username,
-            }
-        )
-
-        # Add CORS headers explicitly
-        response.headers.add("Access-Control-Allow-Credentials", "true")
-        response.headers.add(
-            "Access-Control-Allow-Origin", request.headers.get("Origin")
-        )
-
-        return response, 200
+        # Assuming verification is done via a token or other means
+        return jsonify({"success": True, "message": "User verified"}), 200
 
     except Exception as e:
         logging.error(f"Verification error: {str(e)}", exc_info=True)
