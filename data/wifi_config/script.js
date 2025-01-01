@@ -73,13 +73,13 @@ document.getElementById("wifi-form").onsubmit = async function (e) {
         }
 
         status.innerHTML =
-          "Connected successfully! Redirecting to device IP...";
+          "Connected successfully! Redirecting to login for device registration...";
 
         // Redirect to the new device IP
         if (data.ip) {
           setTimeout(() => {
             window.location.href = `http://${data.ip}/intro_login/index.html`;
-          }, 3000);
+          }, 6000);
         } else {
           throw new Error("No IP address received from device");
         }

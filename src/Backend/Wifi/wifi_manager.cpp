@@ -11,6 +11,7 @@
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
+
 #ifdef USING_DBCONNECTION
 #endif
 
@@ -369,6 +370,7 @@ void WiFiManager::setupConfigRoutes()
                 response["message"] = "Connected to " + ssid;
                 response["ip"] = WiFi.localIP().toString();
                 
+
                 // Save credentials
                 File file = LittleFS.open("/credentials.json", "w");
                 if (file) {

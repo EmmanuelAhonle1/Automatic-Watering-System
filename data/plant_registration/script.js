@@ -37,6 +37,12 @@ const plantDefaults = {
   },
 };
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 // Load saved settings from localStorage
 function loadSavedSettings() {
   const savedSettings = localStorage.getItem("plantNodeSettings");
@@ -209,6 +215,8 @@ function validateForm(event) {
     });
 
     // Simulate registration success
+    uName = getCookies("username");
+
     alert("Plant node registered successfully!");
     // TODO: Add function for calling the API to register the plant node; replace simulation
 
