@@ -5,14 +5,20 @@ from flask_cors import CORS  # type: ignore
 
 app = Flask(__name__)
 
-# Allow all origins with '*'
+# Updated CORS configuration
 CORS(
     app,
     resources={
         r"/*": {
-            "origins": "*",
+            "origins": [
+                "http://192.168.1.240",
+                "http://192.168.4.1",
+                "http://localhost",
+            ],
             "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "expose_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True,
         }
     },
 )
@@ -238,41 +244,57 @@ def retrieve_humidity_thresholds():
 def login():
     if request.method == "OPTIONS":
         response = jsonify({"message": "CORS preflight"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add(
+            "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+        )
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        return response
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type, Authorization"
+        )
+        response.headers.add("Access-Control-Allow-Credentials", "true")
+        return response, 200  # Make sure OPTIONS returns 200
 
     try:
-        # Get request data
         data = request.json
+        print("Received login request:", data)
 
-        # Add debug logging
-        print("Received login request:", data)  # Debug line
-
-        # Validate required fields
         if not data or "username" not in data or "password" not in data:
             return jsonify({"error": "Missing required fields"}), 400
 
-        # Build and execute SQL query
         query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
         cur = mysql.connection.cursor()
-
-        # Add debug logging
-        print("Executing query with username:", data["username"])  # Debug line
-
         cur.execute(query, (data["username"], data["password"]))
         user = cur.fetchone()
         cur.close()
 
-        if user:
-            return jsonify({"success": True, "message": "Login successful"}), 200
+        response = (
+            jsonify({"success": True, "message": "Login successful"})
+            if user
+            else jsonify({"error": "Invalid credentials"})
+        ), (200 if user else 401)
+
+        # Add CORS headers to the response
+        if isinstance(response, tuple):
+            response[0].headers.add(
+                "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+            )
+            response[0].headers.add("Access-Control-Allow-Credentials", "true")
         else:
-            return jsonify({"error": "Invalid credentials"}), 401
+            response.headers.add(
+                "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+            )
+            response.headers.add("Access-Control-Allow-Credentials", "true")
+
+        return response
 
     except Exception as e:
-        print("Login error:", str(e))  # Debug line
-        return jsonify({"error": "Server error", "details": str(e)}), 500
+        print("Login error:", str(e))
+        error_response = jsonify({"error": "Server error", "details": str(e)})
+        error_response.headers.add(
+            "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+        )
+        error_response.headers.add("Access-Control-Allow-Credentials", "true")
+        return error_response, 500
 
 
 @app.route("/users/signup", methods=["POST"])
