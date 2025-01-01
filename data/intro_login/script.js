@@ -1,58 +1,25 @@
 const hashPassword = async (password) => {
-  // const saltRounds = 10;
-  // return new Promise((resolve, reject) => {
-  //   bcrypt.genSalt(saltRounds, (err, salt) => {
-  //     if (err) reject(err);
-  //     bcrypt.hash(password, salt, (err, hash) => {
-  //       if (err) reject(err);
-  //       resolve(hash);
-  //     });
-  //   });
-  // });
   return password;
 };
 
-function getIPAddress() {
-  const ipAddresses = [];
-  Object.values(window).forEach((value) => {
-    if (value && value.constructor === RTCPeerConnection) {
-      const ip = value.iceConnectionState;
-      if (ip && ip !== "closed" && ip !== "failed") {
-        const address = value.iceConnectionState;
-        if (!ipAddresses.includes(address)) {
-          ipAddresses.push(address);
-        }
-      }
+document.addEventListener("DOMContentLoaded", function () {
+  fetch(
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/verify",
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => {
+    if (response.ok) {
+      response.json().then((data) => {
+        alert("Welcome back, " + data.username + "!");
+        window.location.href = `http://${window.location.hostname}/plant_registration/index.html`;
+      });
     }
   });
-  return ipAddresses[0];
-}
-
-function setCookie(name, value, days) {
-  const d = new Date();
-  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
-  const expires = "expires=" + d.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
-}
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  const username = getCookie("username");
-  if (username) {
-    alert("Welcome back, " + username + "!");
-    // Skip the login process or redirect to the logged-in page
-    // For example, you can hide the login form and show the main content
-    document.getElementById("loginForm").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-
-    const ip = getIPAddress();
-    window.location.href = `http://${ip}/plant_registration/index.html`;
-  }
 });
 
 function validateForm(event) {
@@ -65,7 +32,7 @@ function validateForm(event) {
   // Get form values
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-  let isValid = true; // Changed from false to true as default
+  let isValid = true;
 
   // Validate username
   if (username.length < 3) {
@@ -86,13 +53,12 @@ function validateForm(event) {
       .then((hashedPassword) => {
         console.log("Attempting login...");
         return fetch(
-          "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/login", // Removed trailing slash
+          "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/login",
           {
             method: "POST",
-            credentials: "include", // Added for CORS
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
-              // Removed custom CORS headers as they're handled by the server
             },
             body: JSON.stringify({
               username,
@@ -110,20 +76,7 @@ function validateForm(event) {
       .then((data) => {
         if (data.success) {
           console.log("Login successful!");
-          setCookie("username", username, 7);
-
-          // Get ESP IP and redirect
-          return fetch("http://192.168.4.1/get-ip")
-            .then((response) => response.json())
-            .then((data) => {
-              const espIP = data.ip || "192.168.4.1";
-              window.location.href = `http://${espIP}/plant_registration/index.html`;
-            })
-            .catch((error) => {
-              console.log("Using default ESP IP due to error:", error);
-              window.location.href =
-                "http://192.168.4.1/plant_registration/index.html";
-            });
+          window.location.href = `http://${window.location.hostname}/plant_registration/index.html`;
         } else {
           alert(data.error || "Login failed. Please try again.");
         }

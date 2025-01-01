@@ -241,9 +241,9 @@ void WiFiManager::setupConfigRoutes()
     // ----------------- Plant Node Registration -----------------
 
     // Serve the plant_node_registration HTML file
-    server.on("/plant_node_registration/index.html", HTTP_GET, [this]()
+    server.on("/plant_registration/index.html", HTTP_GET, [this]()
               {
-        File file = LittleFS.open("/plant_node_registration/index.html", "r");
+        File file = LittleFS.open("/plant_registration/index.html", "r");
         if (!file) {
             server.send(404, "text/plain", "Plant node registration page not found");
             return;
@@ -252,9 +252,9 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // Serve the plant_node_registration JavaScript file
-    server.on("/plant_node_registration/script.js", HTTP_GET, [this]()
+    server.on("/plant_registration/script.js", HTTP_GET, [this]()
               {
-        File file = LittleFS.open("/plant_node_registration/script.js", "r");
+        File file = LittleFS.open("/plant_registration/script.js", "r");
         if (!file) {
             server.send(404, "text/plain", "JavaScript file not found");
             return;
@@ -263,9 +263,9 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // Serve the plant_node_registration CSS file
-    server.on("/plant_node_registration/styles.css", HTTP_GET, [this]()
+    server.on("/plant_registration/styles.css", HTTP_GET, [this]()
               {
-        File file = LittleFS.open("/plant_node_registration/styles.css", "r");
+        File file = LittleFS.open("/plant_registration/styles.css", "r");
         if (!file) {
             server.send(404, "text/plain", "CSS file not found");
             return;
