@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request  # type: ignore
+from flask import Flask, jsonify, request, make_response  # type: ignore
 from flask_mysqldb import MySQL  # type: ignore
 import os
 from flask_cors import CORS  # type: ignore
+import logging
 
 app = Flask(__name__)
 
@@ -302,14 +303,60 @@ def verify_user():
     try:
         username_cookie = request.cookies.get("username")
 
-        if username_cookie:
-            return jsonify({"success": True, "message": "User verified"}), 200
-        else:
-            return jsonify({"error": "User not verified"}), 401
+        # Log verification attempt (helpful for debugging)
+        logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
+
+        if not username_cookie:
+            return (
+                jsonify(
+                    {
+                        "error": "User not verified",
+                        "message": "No username cookie found",
+                    }
+                ),
+                401,
+            )
+
+        # You might want to add additional verification here
+        # For example, verify the username exists in your database
+        # user = User.query.filter_by(username=username_cookie).first()
+
+        # Create response with renewed cookie
+        response = make_response(
+            jsonify(
+                {
+                    "success": True,
+                    "message": "User verified",
+                    "username": username_cookie,
+                }
+            )
+        )
+
+        # Renew the cookie
+        response.set_cookie(
+            "username",
+            username_cookie,
+            max_age=7 * 24 * 60 * 60,  # 7 days
+            secure=True,
+            httponly=False,  # False since JavaScript needs to read it
+            samesite="Strict",
+            domain="automatic-watering-system-api-e673f34a5955.herokuapp.com",
+            path="/",
+        )
+
+        return response, 200
 
     except Exception as e:
-        print("Verification error:", str(e))
-        return jsonify({"error": "Server error", "details": str(e)}), 500
+        logging.error(f"Verification error: {str(e)}", exc_info=True)
+        return (
+            jsonify(
+                {
+                    "error": "Server error",
+                    "message": "An error occurred during verification",
+                }
+            ),
+            500,
+        )
 
 
 @app.route("/users/signup", methods=["POST"])
