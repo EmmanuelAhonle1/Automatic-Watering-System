@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL  # type: ignore
 import os
 from flask_cors import CORS  # type: ignore
 import logging
+import re
 
 # Set up logging at the top of your app.py
 logging.basicConfig(
@@ -15,16 +16,26 @@ app.secret_key = os.environ.get(
     "SECRET_KEY", "dev-key-for-local-testing"
 )  # Set a secret key for sessions
 
+
+# Function to validate origin with regex
+def allowed_origin(origin):
+    if not origin:
+        return False
+
+    # Regex pattern for http://{ipaddr} format
+    http_ip_pattern = r"^http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$"
+
+    # Also allow specific domains like localhost
+    allowed_patterns = [http_ip_pattern, r"^http://localhost(:\d+)?$"]
+
+    return any(re.match(pattern, origin) for pattern in allowed_patterns)
+
+
 # Updated CORS configuration
 CORS(
     app,
     resources={
         r"/*": {
-            # "origins": [
-            #     "http://192.168.1.240",
-            #     "http://192.168.4.1",
-            #     "http://localhost",
-            # ],
             "origins": "*",
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
@@ -43,6 +54,17 @@ app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
 app.config["MYSQL_DB"] = os.environ.get("MYSQL_DB")
 
 mysql = MySQL(app)
+
+
+@app.after_request
+def after_request(response):
+    origin = request.headers.get("Origin")
+
+    if origin and allowed_origin(origin):
+        response.headers.add("Access-Control-Allow-Origin", origin)
+        response.headers.add("Access-Control-Allow-Credentials", "true")
+
+    return response
 
 
 @app.route("/")
