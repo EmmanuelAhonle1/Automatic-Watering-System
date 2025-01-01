@@ -315,7 +315,7 @@ def login():
                     data["username"],
                     httponly=True,
                     secure=False,
-                    samesite="Strict",
+                    samesite="Lax",
                     max_age=7 * 24 * 60 * 60,  # 7 days
                 )
                 logging.info(
