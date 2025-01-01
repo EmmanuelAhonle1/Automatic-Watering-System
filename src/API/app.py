@@ -323,6 +323,8 @@ def login():
 
         else:  # GET request - verify cookie
             userCookie = request.cookies.get("username")
+            logging.info("Cookie: " + str(userCookie))
+
             if not userCookie:
                 return jsonify({"error": "Not authenticated"}), 401
 
