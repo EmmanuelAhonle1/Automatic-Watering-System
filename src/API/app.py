@@ -222,7 +222,7 @@ def retrieve_humidity_thresholds():
 
 
 # TODO: Create login route
-@app.route("/users/login", methods=["GET"])
+@app.route("/users/login", methods=["POST"])
 def login():
     try:
         # Get request data
