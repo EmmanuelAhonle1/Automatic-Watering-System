@@ -301,9 +301,11 @@ def login():
 @app.route("/users/verify", methods=["GET"])
 def verify_user():
     try:
-        username_cookie = request.cookies.get("username")
+        # Add debug logging
+        print("All cookies:", request.cookies)
+        print("Headers:", dict(request.headers))
 
-        # Log verification attempt (helpful for debugging)
+        username_cookie = request.cookies.get("username")
         logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
 
         if not username_cookie:
@@ -317,11 +319,6 @@ def verify_user():
                 401,
             )
 
-        # You might want to add additional verification here
-        # For example, verify the username exists in your database
-        # user = User.query.filter_by(username=username_cookie).first()
-
-        # Create response with renewed cookie
         response = make_response(
             jsonify(
                 {
@@ -332,16 +329,23 @@ def verify_user():
             )
         )
 
-        # Renew the cookie
+        # Modified cookie settings
         response.set_cookie(
             "username",
             username_cookie,
             max_age=7 * 24 * 60 * 60,  # 7 days
-            secure=True,
-            httponly=False,  # False since JavaScript needs to read it
-            samesite="Strict",
-            domain="automatic-watering-system-api-e673f34a5955.herokuapp.com",
+            secure=False,  # Changed to False since you're using HTTP
+            httponly=False,
+            samesite="Lax",  # Changed from Strict to Lax
+            # domain should match the frontend origin
+            domain=request.headers.get("Host").split(":")[0],
             path="/",
+        )
+
+        # Add CORS headers explicitly
+        response.headers.add("Access-Control-Allow-Credentials", "true")
+        response.headers.add(
+            "Access-Control-Allow-Origin", request.headers.get("Origin")
         )
 
         return response, 200
