@@ -10,6 +10,9 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+app.secret_key = os.environ.get(
+    "SECRET_KEY", "your_secret_key"
+)  # Set a secret key for sessions
 
 # Updated CORS configuration
 CORS(
@@ -273,23 +276,17 @@ def login():
         user = cur.fetchone()
         cur.close()
 
-        response = (
-            jsonify({"success": True, "message": "Login successful"})
-            if user
-            else jsonify({"error": "Invalid credentials"})
-        ), (200 if user else 401)
+        if user:
+            session["username"] = data["username"]
+            response = jsonify({"success": True, "message": "Login successful"})
+        else:
+            response = jsonify({"error": "Invalid credentials"}), 401
 
         # Add CORS headers to the response
-        if isinstance(response, tuple):
-            response[0].headers.add(
-                "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
-            )
-            response[0].headers.add("Access-Control-Allow-Credentials", "true")
-        else:
-            response.headers.add(
-                "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
-            )
-            response.headers.add("Access-Control-Allow-Credentials", "true")
+        response.headers.add(
+            "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+        )
+        response.headers.add("Access-Control-Allow-Credentials", "true")
 
         return response
 
@@ -306,56 +303,25 @@ def login():
 @app.route("/users/verify", methods=["GET"])
 def verify_user():
     try:
-        # Add debug logging
-        logging.info(
-            "All cookies: %s", dict(request.cookies)
-        )  # Convert to dict for better visibility
-        # or
-        logging.info(
-            "All cookies - raw format: %s", request.cookies.items()
-        )  # Show all items
-        # or for even more detail
-        logging.info(
-            "Cookies detailed: %s",
-            {key: request.cookies.get(key) for key in request.cookies.keys()},
-        )
-
-        print("Headers:", dict(request.headers))
-        username_cookie = request.cookies.get("username")
-
-        logging.info(f"Verification attempt - Cookie present: {bool(username_cookie)}")
-        if not username_cookie:
+        username = session.get("username")
+        logging.info(f"Verification attempt - Session present: {bool(username)}")
+        if not username:
             return (
                 jsonify(
                     {
                         "error": "User not verified",
-                        "message": "No username cookie found",
+                        "message": "No username in session",
                     }
                 ),
                 401,
             )
 
-        response = make_response(
-            jsonify(
-                {
-                    "success": True,
-                    "message": "User verified",
-                    "username": username_cookie,
-                }
-            )
-        )
-
-        # Modified cookie settings
-        response.set_cookie(
-            "username",
-            username_cookie,
-            max_age=7 * 24 * 60 * 60,  # 7 days
-            secure=False,  # Changed to False since you're using HTTP
-            httponly=False,
-            samesite="Lax",  # Changed from Strict to Lax
-            # domain should match the frontend origin
-            domain=request.headers.get("Host").split(":")[0],
-            path="/",
+        response = jsonify(
+            {
+                "success": True,
+                "message": "User verified",
+                "username": username,
+            }
         )
 
         # Add CORS headers explicitly
