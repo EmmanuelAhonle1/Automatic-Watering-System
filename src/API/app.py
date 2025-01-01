@@ -18,7 +18,7 @@ CORS(
             ],
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
-            "expose_headers": ["Content-Type", "Authorization"],
+            "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
             "supports_credentials": True,
         }
     },
