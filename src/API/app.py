@@ -242,9 +242,6 @@ def retrieve_humidity_thresholds():
 # TODO: Create login route
 @app.route("/users/login", methods=["OPTIONS", "POST"])
 def login():
-
-    response = None
-
     if request.method == "OPTIONS":
         response = jsonify({"message": "CORS preflight"})
         response.headers.add(
@@ -261,27 +258,20 @@ def login():
         data = request.json
         print("Received login request:", data)
 
-        usernameCookie = request.cookies.get("username")
+        if not data or "username" not in data or "password" not in data:
+            return jsonify({"error": "Missing required fields"}), 400
 
-        if usernameCookie:
-            response = (jsonify({"success": True, "message": "Login successful"}), 200)
+        query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
+        cur = mysql.connection.cursor()
+        cur.execute(query, (data["username"], data["password"]))
+        user = cur.fetchone()
+        cur.close()
 
-        else:
-
-            if not data or "username" not in data or "password" not in data:
-                return jsonify({"error": "Missing required fields"}), 400
-
-            query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
-            cur = mysql.connection.cursor()
-            cur.execute(query, (data["username"], data["password"]))
-            user = cur.fetchone()
-            cur.close()
-
-            response = (
-                jsonify({"success": True, "message": "Login successful"})
-                if user
-                else jsonify({"error": "Invalid credentials"})
-            ), (200 if user else 401)
+        response = (
+            jsonify({"success": True, "message": "Login successful"})
+            if user
+            else jsonify({"error": "Invalid credentials"})
+        ), (200 if user else 401)
 
         # Add CORS headers to the response
         if isinstance(response, tuple):
@@ -305,6 +295,21 @@ def login():
         )
         error_response.headers.add("Access-Control-Allow-Credentials", "true")
         return error_response, 500
+
+
+@app.route("/users/verify", methods=["GET"])
+def verify_user():
+    try:
+        username_cookie = request.cookies.get("username")
+
+        if username_cookie:
+            return jsonify({"success": True, "message": "User verified"}), 200
+        else:
+            return jsonify({"error": "User not verified"}), 401
+
+    except Exception as e:
+        print("Verification error:", str(e))
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
 
 @app.route("/users/signup", methods=["POST"])
