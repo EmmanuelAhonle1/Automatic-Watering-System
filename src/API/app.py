@@ -20,11 +20,12 @@ CORS(
     app,
     resources={
         r"/*": {
-            "origins": [
-                "http://192.168.1.240",
-                "http://192.168.4.1",
-                "http://localhost",
-            ],
+            # "origins": [
+            #     "http://192.168.1.240",
+            #     "http://192.168.4.1",
+            #     "http://localhost",
+            # ],
+            "origins": "*",
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
@@ -152,18 +153,9 @@ def new_plant_node():
         # Get request data
         data = request.json
 
-        # Validate required fields
-        if "macAddress" not in data or "nodeName" not in data:
-            return jsonify({"error": "Missing required fields"}), 400
+        # TODO: Validate the data before proceeding
 
-        # Build and execute SQL query
-        query = "INSERT INTO automatic_watering_system.plant_nodes (macAddress, nodeName) VALUES (%s, %s)"
-        cur = mysql.connection.cursor()
-        cur.execute(query, (data["macAddress"], data["nodeName"]))
-        mysql.connection.commit()
-        cur.close()
-
-        return jsonify({"success": True})
+        # TODO: validate cookie/session token
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
