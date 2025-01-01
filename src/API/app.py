@@ -261,9 +261,9 @@ def login():
         data = request.json
         print("Received login request:", data)
 
-        username = request.cookies.get("username")
+        usernameCookie = request.cookies.get("username")
 
-        if username:
+        if usernameCookie:
             response = (jsonify({"success": True, "message": "Login successful"}), 200)
 
         else:
