@@ -236,7 +236,6 @@ def retrieve_humidity_thresholds():
 # TODO: Create login route
 @app.route("/users/login", methods=["OPTIONS", "POST"])
 def login():
-
     if request.method == "OPTIONS":
         response = jsonify({"message": "CORS preflight"})
         response.headers.add("Access-Control-Allow-Origin", "*")
@@ -248,30 +247,32 @@ def login():
         # Get request data
         data = request.json
 
+        # Add debug logging
+        print("Received login request:", data)  # Debug line
+
         # Validate required fields
-        if "username" not in data or "password" not in data:
+        if not data or "username" not in data or "password" not in data:
             return jsonify({"error": "Missing required fields"}), 400
 
         # Build and execute SQL query
         query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
         cur = mysql.connection.cursor()
+
+        # Add debug logging
+        print("Executing query with username:", data["username"])  # Debug line
+
         cur.execute(query, (data["username"], data["password"]))
         user = cur.fetchone()
         cur.close()
 
         if user:
-            response = jsonify({"success": True}), 200
-            response.headers.add("Access-Control-Allow-Origin", "*")
-            return response
+            return jsonify({"success": True, "message": "Login successful"}), 200
         else:
-            response = jsonify({"error": "Invalid credentials"}), 401
-            response.headers.add("Access-Control-Allow-Origin", "*")
-            return response
+            return jsonify({"error": "Invalid credentials"}), 401
 
     except Exception as e:
-        response = jsonify({"error": f"Database error: {str(e)}"}), 500
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response
+        print("Login error:", str(e))  # Debug line
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
 
 @app.route("/users/signup", methods=["POST"])
