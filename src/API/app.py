@@ -242,6 +242,9 @@ def retrieve_humidity_thresholds():
 # TODO: Create login route
 @app.route("/users/login", methods=["OPTIONS", "POST"])
 def login():
+
+    response = None
+
     if request.method == "OPTIONS":
         response = jsonify({"message": "CORS preflight"})
         response.headers.add(
@@ -258,20 +261,27 @@ def login():
         data = request.json
         print("Received login request:", data)
 
-        if not data or "username" not in data or "password" not in data:
-            return jsonify({"error": "Missing required fields"}), 400
+        username = request.cookies.get("username")
 
-        query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
-        cur = mysql.connection.cursor()
-        cur.execute(query, (data["username"], data["password"]))
-        user = cur.fetchone()
-        cur.close()
+        if username:
+            response = (jsonify({"success": True, "message": "Login successful"}), 200)
 
-        response = (
-            jsonify({"success": True, "message": "Login successful"})
-            if user
-            else jsonify({"error": "Invalid credentials"})
-        ), (200 if user else 401)
+        else:
+
+            if not data or "username" not in data or "password" not in data:
+                return jsonify({"error": "Missing required fields"}), 400
+
+            query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
+            cur = mysql.connection.cursor()
+            cur.execute(query, (data["username"], data["password"]))
+            user = cur.fetchone()
+            cur.close()
+
+            response = (
+                jsonify({"success": True, "message": "Login successful"})
+                if user
+                else jsonify({"error": "Invalid credentials"})
+            ), (200 if user else 401)
 
         # Add CORS headers to the response
         if isinstance(response, tuple):
