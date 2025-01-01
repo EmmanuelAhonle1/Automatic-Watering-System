@@ -4,7 +4,19 @@ import os
 from flask_cors import CORS  # type: ignore
 
 app = Flask(__name__)
-CORS(app)
+
+# Allow all origins with '*'
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+        }
+    },
+)
+
 
 # MySQL configurations - using your provided credentials
 # (but please change these ASAP for security!)
