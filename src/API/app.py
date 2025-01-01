@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request, make_response  # type: ignore
+from flask import Flask, jsonify, request, make_response, session  # type: ignore
+import secrets
 from flask_mysqldb import MySQL  # type: ignore
 import os
 from flask_cors import CORS  # type: ignore
@@ -11,7 +12,7 @@ logging.basicConfig(
 
 app = Flask(__name__)
 app.secret_key = os.environ.get(
-    "SECRET_KEY", "your_secret_key"
+    "SECRET_KEY", "dev-key-for-local-testing"
 )  # Set a secret key for sessions
 
 # Updated CORS configuration
@@ -278,9 +279,17 @@ def login():
 
         if user:
             session["username"] = data["username"]
-            response = jsonify({"success": True, "message": "Login successful"})
+            response = make_response(
+                jsonify({"success": True, "message": "Login successful"})
+            )
+
+            response.headers.add(
+                "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
+            )
+            response.headers.add("Access-Control-Allow-Credentials", "true")
+            return response, 200
         else:
-            response = jsonify({"error": "Invalid credentials"}), 401
+            response = make_response(jsonify({"error": "Invalid credentials"}))
 
         # Add CORS headers to the response
         response.headers.add(
@@ -288,11 +297,13 @@ def login():
         )
         response.headers.add("Access-Control-Allow-Credentials", "true")
 
-        return response
+        return response, 401
 
     except Exception as e:
         print("Login error:", str(e))
-        error_response = jsonify({"error": "Server error", "details": str(e)})
+        error_response = make_response(
+            jsonify({"error": "Server error", "details": str(e)})
+        )
         error_response.headers.add(
             "Access-Control-Allow-Origin", request.headers.get("Origin", "*")
         )
