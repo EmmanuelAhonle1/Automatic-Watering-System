@@ -222,7 +222,7 @@ def retrieve_humidity_thresholds():
 
 
 # TODO: Create login route
-@app.route("/users/login", methods=["POST"])
+@app.route("/users/login", methods=["GET"])
 def login():
     try:
         # Get request data
@@ -248,7 +248,7 @@ def login():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-@app.route("/users/createUser", methods=["POST"])
+@app.route("/users/signup", methods=["POST"])
 def create_user():
 
     # Get request data
