@@ -65,7 +65,7 @@ function validateForm(event) {
   // Get form values
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-  let isValid = false;
+  let isValid = true; // Changed from false to true as default
 
   // Validate username
   if (username.length < 3) {
@@ -81,39 +81,60 @@ function validateForm(event) {
     isValid = false;
   }
 
-  hashPassword(password)
-    .then((hashedPassword) => {
-      console.log("Hashed password:", hashedPassword);
-      return fetch(
-        `https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/login/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password: hashedPassword }),
+  if (isValid) {
+    hashPassword(password)
+      .then((hashedPassword) => {
+        console.log("Attempting login...");
+        return fetch(
+          "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/login", // Removed trailing slash
+          {
+            method: "POST",
+            credentials: "include", // Added for CORS
+            headers: {
+              "Content-Type": "application/json",
+              // Removed custom CORS headers as they're handled by the server
+            },
+            body: JSON.stringify({
+              username,
+              password: hashedPassword,
+            }),
+          }
+        );
+      })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => Promise.reject(err));
         }
-      );
-    })
-    .then((response) => {
-      if (response.ok) {
-        isValid = true;
-        // Set a cookie with the username (or a token)
-        setCookie("username", username, 7); // Cookie expires in 7 days
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          console.log("Login successful!");
+          setCookie("username", username, 7);
 
-        const ip = getIPAddress();
-        console.log("IP address:", ip);
-        // Redirect or perform other actions upon successful login
-        window.location.href = `http://${ip}/plant_registration/index.html`; // Replace with your desired URL
-
-        return true;
-      } else {
-        alert("Login failed. Please try again.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error during login:", error);
-    });
+          // Get ESP IP and redirect
+          return fetch("http://192.168.4.1/get-ip")
+            .then((response) => response.json())
+            .then((data) => {
+              const espIP = data.ip || "192.168.4.1";
+              window.location.href = `http://${espIP}/plant_registration/index.html`;
+            })
+            .catch((error) => {
+              console.log("Using default ESP IP due to error:", error);
+              window.location.href =
+                "http://192.168.4.1/plant_registration/index.html";
+            });
+        } else {
+          alert(data.error || "Login failed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error during login:", error);
+        alert(
+          error.error || "An error occurred during login. Please try again."
+        );
+      });
+  }
 
   return false;
 }
@@ -192,6 +213,9 @@ function validateSignupForm(event) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
             },
             body: JSON.stringify({
               username,
