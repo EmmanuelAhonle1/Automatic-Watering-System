@@ -234,8 +234,16 @@ def retrieve_humidity_thresholds():
 
 
 # TODO: Create login route
-@app.route("/users/login", methods=["POST"])
+@app.route("/users/login", methods=["OPTIONS", "POST"])
 def login():
+
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        return response
+
     try:
         # Get request data
         data = request.json
@@ -252,12 +260,18 @@ def login():
         cur.close()
 
         if user:
-            return jsonify({"success": True})
+            response = jsonify({"success": True}), 200
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            return response
         else:
-            return jsonify({"error": "Invalid credentials"}), 401
+            response = jsonify({"error": "Invalid credentials"}), 401
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            return response
 
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        response = jsonify({"error": f"Database error: {str(e)}"}), 500
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
 
 
 @app.route("/users/signup", methods=["POST"])
