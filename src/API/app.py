@@ -209,6 +209,7 @@ def new_plant_node():
         humidity_threshold_id = data.get("humidityThresholdID")
         moisture_threshold_id = data.get("moistureThresholdID")
         temperature_threshold_id = data.get("temperatureThresholdID")
+        macAddress = data.get("macAddress")
 
         # Get user UUID
         user_query = """
@@ -243,8 +244,8 @@ def new_plant_node():
             INSERT INTO automatic_watering_system.plant_nodes (
                 connectedUserUUID, nodeName, plantSpecies, wateringFrequencyID,
                 lightThresholdID, humidityThresholdID, moistureThresholdID,
-                temperatureThresholdID
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                temperatureThresholdID, macAddress
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         params = (
             user_uuid,
@@ -255,6 +256,7 @@ def new_plant_node():
             humidity_threshold_id,
             moisture_threshold_id,
             temperature_threshold_id,
+            macAddress,
         )
 
         cur = mysql.connection.cursor()
