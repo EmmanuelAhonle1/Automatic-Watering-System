@@ -56,6 +56,14 @@ public:
      */
     std::string build() const;
 
+    /**
+     * @brief Form the URL with the given endpoint.
+     *
+     * @param endpoint The endpoint to append to the base URL.
+     * @return std::string The complete URL with the endpoint.
+     */
+    std::string formURLWithEndpoint(const std::string &endpoint) const;
+
 private:
     std::string baseUrl = API_URL;                              // Base URL for the API
     std::string user;                                           // Username for authentication

@@ -217,7 +217,8 @@ async function submitForm() {
 
     const data = await response.json();
     if (!data.error) {
-      alert("Plant node registered successfully!");
+      alert("Plant node registered successfully! This tab will now close.");
+      self.close();
     } else {
       alert("Error registering plant node: " + data.error);
     }

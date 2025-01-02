@@ -18,7 +18,7 @@ JsonDocument getPlantNodeSettings()
                                   "plantSpecies", "wateringFrequencyID", "lightThresholdID",
                                   "humidityThresholdID", "moistureThresholdID", "temperatureThresholdID"});
 
-    string response = sendGetRequest(urlEndpoint, queryBuilder.build());
+    string response = sendGetRequest(queryBuilder.formURLWithEndpoint(urlEndpoint), queryBuilder.build());
     if (response.empty())
     {
         Serial.println("Empty response received");

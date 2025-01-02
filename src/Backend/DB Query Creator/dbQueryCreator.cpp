@@ -13,9 +13,11 @@ string sendGetRequest(const string &endpoint, const string &query)
     HTTPClient http;
     string payload = "";
 
-    string url = string(API_URL) + endpoint + "?" + query;
+    string url = endpoint + query;
 
     client.setInsecure(); // Required for HTTPS
+
+    Serial.println("url: " + String(url.c_str()));
 
     if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
     {
@@ -46,7 +48,7 @@ string sendPostRequest(const string &endpoint, const string &query)
     HTTPClient http;
     string payload = "";
 
-    string url = string(API_URL) + endpoint;
+    string url = endpoint;
 
     client.setInsecure(); // Required for HTTPS
 
@@ -114,10 +116,17 @@ std::string URLQueryBuilder::urlEncode(const std::string &str)
     return escaped.str();
 }
 
+std::string URLQueryBuilder::formURLWithEndpoint(const std::string &endpoint) const
+{
+    std::ostringstream url;
+    url << baseUrl << endpoint;
+
+    return url.str();
+}
+
 std::string URLQueryBuilder::build() const
 {
     std::ostringstream url;
-    url << baseUrl;
 
     bool firstParam = true;
     for (const auto &param : parameters)
