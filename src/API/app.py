@@ -213,6 +213,20 @@ def new_plant_node():
         moisture_threshold_id = data.get("moistureThresholdID")
         temperature_threshold_id = data.get("temperatureThresholdID")
 
+        # Retrieve userUUID from the database
+        user_query = """
+            SELECT userUUID FROM users WHERE username = %s
+        """
+        cur = mysql.connection.cursor()
+        cur.execute(user_query, (username,))
+        user = cur.fetchone()
+
+        if not user:
+            cur.close()
+            return jsonify({"error": "User not found"}), 404
+
+        user_uuid = user["userUUID"]
+
         # Check for duplicate plant node
         check_query = """
             SELECT * FROM plant_nodes
@@ -229,13 +243,13 @@ def new_plant_node():
         # Insert the new plant node into the database
         query = """
             INSERT INTO plant_nodes (
-                username, nodeName, plantSpecies, wateringFrequencyID,
+                connectedUserUUID, nodeName, plantSpecies, wateringFrequencyID,
                 lightThresholdID, humidityThresholdID, moistureThresholdID,
                 temperatureThresholdID
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         params = (
-            username,
+            user_uuid,
             node_name,
             plant_species,
             watering_frequency_id,
