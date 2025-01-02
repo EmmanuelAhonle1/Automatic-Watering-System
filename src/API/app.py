@@ -5,16 +5,28 @@ import os
 from flask_cors import CORS  # type: ignore
 import logging
 import re
+from datetime import timedelta, datetime
+from functools import wraps
 
-# Set up logging at the top of your app.py
+# Set up logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
 app = Flask(__name__)
-app.secret_key = os.environ.get(
-    "SECRET_KEY", "dev-key-for-local-testing"
-)  # Set a secret key for sessions
+app.secret_key = os.environ.get("SECRET_KEY", "dev-key-for-local-testing")
+app.permanent_session_lifetime = timedelta(days=7)  # Set session lifetime to 7 days
+
+
+# Login decorator for protected routes
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "username" not in session:
+            return jsonify({"error": "Authentication required"}), 401
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 # Function to validate origin with regex
@@ -22,9 +34,8 @@ def allowed_origin(origin):
     if not origin:
         return False
 
-    # Allow your frontend domain explicitly
     allowed_patterns = [
-        r"^http://192\.168\.1\.240(:\d+)?$",  # Add this
+        r"^http://192\.168\.1\.240(:\d+)?$",
         r"^http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$",
         r"^http://localhost(:\d+)?$",
     ]
@@ -32,7 +43,7 @@ def allowed_origin(origin):
     return any(re.match(pattern, origin) for pattern in allowed_patterns)
 
 
-# Updated CORS configuration
+# CORS configuration
 CORS(
     app,
     resources={
@@ -43,16 +54,14 @@ CORS(
                 "Content-Type",
                 "Authorization",
                 "Access-Control-Allow-Credentials",
-            ],  # Added Access-Control-Allow-Credentials
+            ],
             "expose_headers": ["Content-Type", "Authorization", "Set-Cookie"],
             "supports_credentials": True,
         }
     },
 )
 
-
-# MySQL configurations - using your provided credentials
-# (but please change these ASAP for security!)
+# MySQL configurations
 app.config["MYSQL_HOST"] = os.environ.get("MYSQL_HOST")
 app.config["MYSQL_USER"] = os.environ.get("MYSQL_USER")
 app.config["MYSQL_PASSWORD"] = os.environ.get("MYSQL_PASSWORD")
@@ -69,7 +78,7 @@ def after_request(response):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type, Authorization, Access-Control-Allow-Credentials"  # Added Access-Control-Allow-Credentials
+            "Content-Type, Authorization, Access-Control-Allow-Credentials"
         )
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
 
@@ -80,7 +89,6 @@ def after_request(response):
 def index():
     try:
         cur = mysql.connection.cursor()
-        # Test the connection
         cur.execute("SELECT 1")
         cur.close()
         return "Database connection successful! Welcome to the Automatic Watering System API"
@@ -179,6 +187,7 @@ def select_plant():
 
 
 @app.route("/plantNode/newPlantNode", methods=["POST"])
+@login_required
 def new_plant_node():
     try:
         # Get request data
@@ -272,7 +281,6 @@ def retrieve_humidity_thresholds():
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
-# TODO: Create login route
 @app.route("/users/login", methods=["OPTIONS", "GET", "POST"])
 def login():
     if request.method == "OPTIONS":
@@ -289,7 +297,6 @@ def login():
 
     try:
         if request.method == "POST":
-            # Handle username/password login
             data = request.json
             if not data or "username" not in data or "password" not in data:
                 return jsonify({"error": "Missing required fields"}), 400
@@ -301,54 +308,56 @@ def login():
             cur.close()
 
             if user:
-                response = make_response(
+                session.permanent = True
+                session["username"] = data["username"]
+                session["last_activity"] = datetime.now().isoformat()
+
+                return (
                     jsonify(
                         {
                             "success": True,
                             "message": "Login successful",
                             "username": data["username"],
                         }
-                    )
+                    ),
+                    200,
                 )
-                # Set cookie on successful login
-                response.set_cookie(
-                    "username",
-                    data["username"],
-                    httponly=True,
-                    secure=False,
-                    samesite="Lax",
-                    max_age=7 * 24 * 60 * 60,  # 7 days
-                    domain="automatic-watering-system-api-e673f34a5955.herokuapp.com",
-                )
-                logging.info(
-                    "Set-Cookie header: " + str(response.headers.get("Set-Cookie"))
-                )
-                return response, 200
+
             return jsonify({"error": "Invalid credentials"}), 401
 
-        else:  # GET request - verify cookie
-            userCookie = request.cookies.get("username")
-            logging.info("Cookie: " + str(userCookie))
+        else:  # GET request - verify session
+            username = session.get("username")
+            last_activity = session.get("last_activity")
 
-            if not userCookie:
+            if not username:
                 return jsonify({"error": "Not authenticated"}), 401
+
+            # Check session age
+            if last_activity:
+                last_activity_time = datetime.fromisoformat(last_activity)
+                if datetime.now() - last_activity_time > timedelta(days=7):
+                    session.clear()
+                    return jsonify({"error": "Session expired"}), 401
 
             # Verify user exists in database
             cur = mysql.connection.cursor()
             cur.execute(
                 "SELECT username FROM automatic_watering_system.users WHERE username = %s",
-                (userCookie,),
+                (username,),
             )
             user = cur.fetchone()
             cur.close()
 
             if user:
+                session["last_activity"] = (
+                    datetime.now().isoformat()
+                )  # Update last activity
                 return (
                     jsonify(
                         {
                             "success": True,
                             "message": "User verified",
-                            "username": userCookie,
+                            "username": username,
                         }
                     ),
                     200,
@@ -360,13 +369,16 @@ def login():
         return jsonify({"error": "Server error"}), 500
 
 
+@app.route("/users/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"success": True, "message": "Logged out successfully"}), 200
+
+
 @app.route("/users/signup", methods=["POST"])
 def create_user():
-
-    # Get request data
     data = request.json
 
-    # Build and execute SQL query
     username = data.get("username")
     password = data.get("password")
     email = data.get("email")
