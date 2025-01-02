@@ -56,7 +56,7 @@ CORS(
     app,
     resources={
         r"/*": {
-            "origins": ["http://192.168.1.240", "http://localhost"],  # Be explicit
+            "origins": "*",  # Be explicit
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": [
                 "Content-Type",
