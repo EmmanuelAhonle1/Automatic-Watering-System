@@ -13,9 +13,17 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key-for-local-testing")
 app.permanent_session_lifetime = timedelta(days=7)  # Set session lifetime to 7 days
+
+# Add this near the top of app.py with other configurations
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "None"  # Important for cross-origin
+app.config["SESSION_COOKIE_DOMAIN"] = (
+    "automatic-watering-system-api-e673f34a5955.herokuapp.com"
+)
 
 
 # Login decorator for protected routes
@@ -48,7 +56,7 @@ CORS(
     app,
     resources={
         r"/*": {
-            "origins": "*",
+            "origins": ["http://192.168.1.240", "http://localhost"],  # Be explicit
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": [
                 "Content-Type",
@@ -283,6 +291,9 @@ def retrieve_humidity_thresholds():
 
 @app.route("/users/login", methods=["OPTIONS", "GET", "POST"])
 def login():
+    logging.info(f"Session before: {session}")  # Add this
+    logging.info(f"Request cookies: {request.cookies}")  # Add this
+
     if request.method == "OPTIONS":
         response = make_response()
         origin = request.headers.get("Origin")
@@ -319,6 +330,7 @@ def login():
                 session["username"] = data["username"]
                 session["last_activity"] = datetime.now().isoformat()
                 logging.info(f"User {data['username']} logged in successfully")
+                logging.info(f"Session after login: {session}")  # Add this
 
                 return (
                     jsonify(
