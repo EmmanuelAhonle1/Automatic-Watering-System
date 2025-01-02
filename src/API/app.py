@@ -217,7 +217,7 @@ def new_plant_node():
         user_query = """
             SELECT userUUID FROM users WHERE username = %s
         """
-        logging.info(f"Retrieving userUUID for user {username}")
+        logging.info(f"userUUID Query: {user_query, (username,)})")
         cur = mysql.connection.cursor()
         cur.execute(user_query, (username,))
         user = cur.fetchone()
@@ -233,6 +233,8 @@ def new_plant_node():
             SELECT * FROM plant_nodes
             WHERE connectedUserUUID = %s AND nodeName = %s
         """
+
+        logging.info(f"Check Query: {check_query, (user_uuid, node_name)}")
         cur = mysql.connection.cursor()
         cur.execute(check_query, (user_uuid, node_name))
         existing_plant = cur.fetchone()
@@ -259,6 +261,7 @@ def new_plant_node():
             moisture_threshold_id,
             temperature_threshold_id,
         )
+        logging.info("Query: {}".format((query, params)))
 
         cur.execute(query, params)
         mysql.connection.commit()
