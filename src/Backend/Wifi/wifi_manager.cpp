@@ -17,6 +17,7 @@ IPAddress apIP(192, 168, 4, 1);
 
 #define LED_BUILTIN 2
 
+// TODO: Add RGB LED statuses for different states
 WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
     : server(server), deviceManager(deviceManager) {}
 
@@ -25,6 +26,7 @@ void WiFiManager::setupDNS()
 {
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", apIP);
+    dnsServer.setTTL(0);
 
     Serial.println("DNS Server started");
     Serial.println("Captive Portal IP: " + apIP.toString());
@@ -33,14 +35,18 @@ void WiFiManager::setupDNS()
 // Send a success response for the captive portal
 void WiFiManager::sendCaptivePortalSuccess(const String &contentType, const String &content)
 {
+    // Add these headers for better iOS detection
     server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     server.sendHeader("Pragma", "no-cache");
     server.sendHeader("Expires", "-1");
     server.sendHeader("Clear-Site-Data", "\"*\"");
 
-    if (server.hasHeader("User-Agent") && server.header("User-Agent").indexOf("CaptiveNetworkSupport") >= 0)
+    // Specific for Apple devices
+    if (server.hasHeader("User-Agent") &&
+        server.header("User-Agent").indexOf("CaptiveNetworkSupport") >= 0)
     {
         server.sendHeader("X-Apple-Success", "true");
+        server.sendHeader("X-Apple-Status", "200"); // Add this line
     }
 
     server.send(200, contentType, content);
@@ -119,7 +125,7 @@ void WiFiManager::handleClient()
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
-    pingWiFi();
+    // pingWiFi();
     // pingDatabase();
 
     // Check WiFi connection status and attempt to reconnect if disconnected
@@ -340,13 +346,13 @@ void WiFiManager::setupConfigRoutes()
 
     server.on("/hotspot-detect.html", HTTP_GET, [this]()
               {
-        if (WiFi.status() == WL_CONNECTED) {
-            sendCaptivePortalSuccess("text/html", 
-                "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
-        } else {
-            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-            server.send(302, "text/plain", "");
-        } });
+    if (WiFi.status() == WL_CONNECTED) {
+        sendCaptivePortalSuccess("text/html", 
+            "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+    } else {
+        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+        server.send(302, "text/plain", "");
+    } });
 
     server.on("/fwlink", HTTP_GET, [this]()
               {
@@ -436,6 +442,14 @@ void WiFiManager::setupConfigRoutes()
               {
         String mac = WiFi.macAddress();
         server.send(200, "application/json", "{\"macAddress\":\"" + mac + "\"}"); });
+
+    server.on("/success.html", HTTP_GET, [this]()
+              { sendCaptivePortalSuccess("text/html",
+                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
+
+    server.on("/library/test/success.html", HTTP_GET, [this]()
+              { sendCaptivePortalSuccess("text/html",
+                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
 }
 
 // Connect to a WiFi network

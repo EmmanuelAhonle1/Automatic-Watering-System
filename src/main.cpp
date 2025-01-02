@@ -11,13 +11,24 @@
 #include <ArduinoOTA.h>
 #include "Backend/Device/device_manager.hpp"
 #include "Backend/Wifi/wifi_manager.hpp"
+#include "Backend/RGBStatus/rgb_status.hpp"
+#include <Ticker.h>
 
 ESP8266WebServer server(80);
 DeviceManager deviceManager;
 WiFiManager wifiManager(server, &deviceManager);
 
-#define LED_BUILTIN D4
+RGBStateHandler rgbStateHandler;
 
+Ticker timer;
+
+#define LED_BUILTIN D4
+bool ledState = false;
+
+void timerISR()
+{
+  rgbStateHandler.handleState(currentState::WIFI_CONNECTED);
+}
 void setup()
 {
   Serial.begin(115200);
@@ -29,6 +40,7 @@ void setup()
     Serial.println("Failed to mount file system");
     return;
   }
+  timer.attach_ms(100, timerISR);
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);

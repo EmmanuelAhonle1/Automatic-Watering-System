@@ -193,7 +193,6 @@ async function submitForm() {
 
     console.log("MAC Address: " + settings.macAddress);
 
-    // TODO: Add function for calling the API to register the plant node; replace simulation
     const response = await fetch(
       `https://automatic-watering-system-api-e673f34a5955.herokuapp.com/plantNode/newPlantNode`,
       {
