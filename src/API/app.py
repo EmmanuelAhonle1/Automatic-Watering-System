@@ -231,10 +231,10 @@ def new_plant_node():
         # Check for duplicate plant node
         check_query = """
             SELECT * FROM plant_nodes
-            WHERE username = %s AND nodeName = %s
+            WHERE connectedUserUUID = %s AND nodeName = %s
         """
         cur = mysql.connection.cursor()
-        cur.execute(check_query, (username, node_name))
+        cur.execute(check_query, (user_uuid, node_name))
         existing_plant = cur.fetchone()
 
         if existing_plant:
