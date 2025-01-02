@@ -17,7 +17,9 @@ string sendGetRequest(const string &endpoint, const string &query)
 
     client.setInsecure(); // Required for HTTPS
 
+#ifdef DEBUG_DBQC
     Serial.println("url: " + String(url.c_str()));
+#endif
 
     if (http.begin(client, url.c_str()) && WiFi.status() == WL_CONNECTED)
     {
