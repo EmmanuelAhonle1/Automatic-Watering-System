@@ -286,6 +286,8 @@ def login():
     if request.method == "OPTIONS":
         response = make_response()
         origin = request.headers.get("Origin")
+        logging.info(f"OPTIONS request from origin: {origin}")
+
         if origin and allowed_origin(origin):
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
@@ -293,12 +295,17 @@ def login():
                 "Content-Type, Authorization, Access-Control-Allow-Credentials"
             )
             response.headers["Access-Control-Allow-Credentials"] = "true"
+            logging.info("CORS headers set for OPTIONS request")
+
         return response
 
     try:
         if request.method == "POST":
             data = request.json
+            logging.info(f"Received login request: {data}")
+
             if not data or "username" not in data or "password" not in data:
+                logging.info("Missing required fields in login request")
                 return jsonify({"error": "Missing required fields"}), 400
 
             query = "SELECT * FROM automatic_watering_system.users WHERE username = %s AND password = %s"
@@ -311,6 +318,7 @@ def login():
                 session.permanent = True
                 session["username"] = data["username"]
                 session["last_activity"] = datetime.now().isoformat()
+                logging.info(f"User {data['username']} logged in successfully")
 
                 return (
                     jsonify(
@@ -323,6 +331,7 @@ def login():
                     200,
                 )
 
+            logging.info(f"Invalid credentials for user {data['username']}")
             return jsonify({"error": "Invalid credentials"}), 401
 
         else:  # GET request - verify session
@@ -330,6 +339,7 @@ def login():
             last_activity = session.get("last_activity")
 
             if not username:
+                logging.info("No username in session for verification")
                 return jsonify({"error": "Not authenticated"}), 401
 
             # Check session age
@@ -337,6 +347,7 @@ def login():
                 last_activity_time = datetime.fromisoformat(last_activity)
                 if datetime.now() - last_activity_time > timedelta(days=7):
                     session.clear()
+                    logging.info("Session expired for user")
                     return jsonify({"error": "Session expired"}), 401
 
             # Verify user exists in database
@@ -352,6 +363,7 @@ def login():
                 session["last_activity"] = (
                     datetime.now().isoformat()
                 )  # Update last activity
+                logging.info(f"User {username} verified successfully")
                 return (
                     jsonify(
                         {
@@ -362,6 +374,8 @@ def login():
                     ),
                     200,
                 )
+
+            logging.info(f"Invalid session for user {username}")
             return jsonify({"error": "Invalid session"}), 401
 
     except Exception as e:
