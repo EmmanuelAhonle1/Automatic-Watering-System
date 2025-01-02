@@ -215,7 +215,7 @@ def new_plant_node():
 
         # Retrieve userUUID from the database
         user_query = """
-            SELECT userUUID FROM users WHERE username = '%s'
+            SELECT userUUID FROM automatic_watering_system.users WHERE username = '%s'
         """
         logging.info(f"userUUID Query: {user_query % username}")
         cur = mysql.connection.cursor()
@@ -227,7 +227,7 @@ def new_plant_node():
             return jsonify({"error": "User not found"}), 404
 
         user_uuid = user["userUUID"]
-
+        logging.info(f"User UUID: {user_uuid}")
         # Check for duplicate plant node
         check_query = """
             SELECT * FROM plant_nodes
