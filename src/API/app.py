@@ -205,11 +205,11 @@ def new_plant_node():
         # Extract data from the request
         node_name = data.get("nodeName")
         plant_species = data.get("plantSpecies")
-        watering_frequency_id = data.get("wateringFrequencyID")
-        light_threshold_id = data.get("lightThresholdID")
-        humidity_threshold_id = data.get("humidityThresholdID")
-        moisture_threshold_id = data.get("moistureThresholdID")
-        temperature_threshold_id = data.get("temperatureThresholdID")
+        watering_frequency_id = int(data.get("wateringFrequencyID"))
+        light_threshold_id = int(data.get("lightThresholdID"))
+        humidity_threshold_id = int(data.get("humidityThresholdID"))
+        moisture_threshold_id = int(data.get("moistureThresholdID"))
+        temperature_threshold_id = int(data.get("temperatureThresholdID"))
         macAddress = data.get("macAddress")
 
         # Get user UUID
