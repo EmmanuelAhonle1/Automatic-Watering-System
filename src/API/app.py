@@ -198,10 +198,7 @@ def select_plant():
 @login_required
 def new_plant_node():
     try:
-        # Get request data
         data = request.json
-
-        # Retrieve username from session
         username = session.get("username")
 
         # Extract data from the request
@@ -213,41 +210,37 @@ def new_plant_node():
         moisture_threshold_id = data.get("moistureThresholdID")
         temperature_threshold_id = data.get("temperatureThresholdID")
 
-        # Retrieve userUUID from the database
+        # Get user UUID
         user_query = """
-            SELECT userUUID FROM automatic_watering_system.users WHERE username = `%s`
+            SELECT userUUID FROM automatic_watering_system.users WHERE username = %s
         """
-        logging.info(f"userUUID Query: {user_query % username}")
         cur = mysql.connection.cursor()
         cur.execute(user_query, (username,))
-        user = cur.fetchall()
+        user = cur.fetchone()
         cur.close()
 
         if not user:
-            cur.close()
             return jsonify({"error": "User not found"}), 404
 
-        user_uuid = user["userUUID"]
-        logging.info(f"User UUID: {user}")
-        # Check for duplicate plant node
+        user_uuid = user[0]  # Get first element of tuple
+        logging.info(f"User UUID: {user_uuid}")
+
+        # Check for duplicate
         check_query = """
-            SELECT * FROM plant_nodes
+            SELECT * FROM automatic_watering_system.plant_nodes
             WHERE connectedUserUUID = %s AND nodeName = %s
         """
-
-        logging.info(f"Check Query: {check_query % user_uuid, node_name}")
         cur = mysql.connection.cursor()
         cur.execute(check_query, (user_uuid, node_name))
         existing_plant = cur.fetchone()
         cur.close()
 
         if existing_plant:
-            cur.close()
             return jsonify({"error": "Duplicate plant node found"}), 409
 
-        # Insert the new plant node into the database
+        # Insert new plant node
         query = """
-            INSERT INTO plant_nodes (
+            INSERT INTO automatic_watering_system.plant_nodes (
                 connectedUserUUID, nodeName, plantSpecies, wateringFrequencyID,
                 lightThresholdID, humidityThresholdID, moistureThresholdID,
                 temperatureThresholdID
@@ -263,8 +256,8 @@ def new_plant_node():
             moisture_threshold_id,
             temperature_threshold_id,
         )
-        logging.info(f"Final Query: {query % params}")
 
+        cur = mysql.connection.cursor()
         cur.execute(query, params)
         mysql.connection.commit()
         cur.close()
@@ -272,6 +265,7 @@ def new_plant_node():
         return jsonify({"message": "Plant node registered successfully!"}), 201
 
     except Exception as e:
+        logging.error(f"Error in new_plant_node: {str(e)}", exc_info=True)
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
 
