@@ -215,9 +215,9 @@ def new_plant_node():
 
         # Retrieve userUUID from the database
         user_query = """
-            SELECT userUUID FROM users WHERE username = %s
+            SELECT userUUID FROM users WHERE username = '%s'
         """
-        logging.info(f"userUUID Query: {user_query % username})")
+        logging.info(f"userUUID Query: {user_query % username}")
         cur = mysql.connection.cursor()
         cur.execute(user_query, (username,))
         user = cur.fetchone()
