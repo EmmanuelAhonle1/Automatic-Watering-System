@@ -220,7 +220,8 @@ def new_plant_node():
         logging.info(f"userUUID Query: {user_query % username}")
         cur = mysql.connection.cursor()
         cur.execute(user_query, (username,))
-        user = cur.fetchone()
+        user = cur.fetchall()
+        cur.close()
 
         if not user:
             cur.close()
@@ -238,6 +239,7 @@ def new_plant_node():
         cur = mysql.connection.cursor()
         cur.execute(check_query, (user_uuid, node_name))
         existing_plant = cur.fetchone()
+        cur.close()
 
         if existing_plant:
             cur.close()
