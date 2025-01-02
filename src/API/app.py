@@ -201,9 +201,8 @@ def new_plant_node():
         # Get request data
         data = request.json
 
-        # TODO: Validate the data before proceeding
-
-        # TODO: validate cookie/session token
+        # TODO: retrieve username from session
+        username = session.get("username")
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
@@ -214,7 +213,7 @@ def retrieve_watering_frequencies():
     try:
         cur = mysql.connection.cursor()
         cur.execute(
-            "SELECT frequencyID, frequency_name FROM automatic_watering_system.watering_frequencies"
+            "SELECT wateringFrequencyID, frequency_name FROM automatic_watering_system.watering_frequencies"
         )
         frequencies = cur.fetchall()
         cur.close()
