@@ -7,6 +7,7 @@ import logging
 import re
 from datetime import timedelta, datetime
 from functools import wraps
+import json
 
 # Set up logging
 logging.basicConfig(
@@ -238,7 +239,7 @@ def new_plant_node():
 
         if existing_plant:
             return jsonify({"error": "Duplicate plant node found"}), 409
-        logging.info("Mac address: " + macAddress)
+        logging.info("Mac address: " + json.dumps(data))
         # Insert new plant node
         query = """
             INSERT INTO automatic_watering_system.plant_nodes (
