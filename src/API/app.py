@@ -227,7 +227,7 @@ def new_plant_node():
             return jsonify({"error": "User not found"}), 404
 
         user_uuid = user["userUUID"]
-        logging.info(f"User UUID: {user_uuid}")
+        logging.info(f"User UUID: {user}")
         # Check for duplicate plant node
         check_query = """
             SELECT * FROM plant_nodes
