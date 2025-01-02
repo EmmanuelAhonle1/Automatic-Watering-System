@@ -218,7 +218,32 @@ function validateForm(event) {
     uName = getCookies("username");
 
     alert("Plant node registered successfully!");
+
+    // TODO: Create function to retrieve UUID for the user using the username
+
     // TODO: Add function for calling the API to register the plant node; replace simulation
+    fetch(
+      `https://automatic-watering-system-api-e673f34a5955.herokuapp.com/plantNode/registerPlantNode/${uName}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nodeName: nodeName,
+          plantSpecies: plantSpecies,
+          wateringFrequency: wateringFrequency,
+          customFrequency: customFrequency,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
 
     // Clear form
     document.getElementById("registrationForm").reset();

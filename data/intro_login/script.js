@@ -4,7 +4,7 @@ const hashPassword = async (password) => {
 
 document.addEventListener("DOMContentLoaded", function () {
   fetch(
-    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/verify",
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/login",
     {
       method: "GET",
       credentials: "include",
@@ -12,14 +12,27 @@ document.addEventListener("DOMContentLoaded", function () {
         "Content-Type": "application/json",
       },
     }
-  ).then((response) => {
-    if (response.ok) {
-      response.json().then((data) => {
-        alert("Welcome back, " + data.username + "!");
+  )
+    .then((response) => {
+      console.log("Response status:", response.status); // Add debug logging
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.log("Not logged in - redirecting to login page");
+          return null;
+        }
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data && data.username) {
+        console.log("Login data:", data); // Add debug logging
         window.location.href = `http://${window.location.hostname}/plant_registration/index.html`;
-      });
-    }
-  });
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 });
 
 function validateForm(event) {
@@ -76,6 +89,7 @@ function validateForm(event) {
       .then((data) => {
         if (data.success) {
           console.log("Login successful!");
+          localStorage.setItem("isLoggedIn", "true");
           window.location.href = `http://${window.location.hostname}/plant_registration/index.html`;
         } else {
           alert(data.error || "Login failed. Please try again.");
@@ -262,3 +276,21 @@ document.getElementById("phoneNumber").addEventListener("input", function (e) {
     document.getElementById("phoneNumberError").textContent = "";
   }
 });
+
+function logout() {
+  fetch(
+    "https://automatic-watering-system-api-e673f34a5955.herokuapp.com/users/logout",
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  ).then((response) => {
+    if (response.ok) {
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "/intro_login/index.html";
+    }
+  });
+}
