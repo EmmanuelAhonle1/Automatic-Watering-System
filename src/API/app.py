@@ -201,8 +201,55 @@ def new_plant_node():
         # Get request data
         data = request.json
 
-        # TODO: retrieve username from session
+        # Retrieve username from session
         username = session.get("username")
+
+        # Extract data from the request
+        node_name = data.get("nodeName")
+        plant_species = data.get("plantSpecies")
+        watering_frequency_id = data.get("wateringFrequencyID")
+        light_threshold_id = data.get("lightThresholdID")
+        humidity_threshold_id = data.get("humidityThresholdID")
+        moisture_threshold_id = data.get("moistureThresholdID")
+        temperature_threshold_id = data.get("temperatureThresholdID")
+
+        # Check for duplicate plant node
+        check_query = """
+            SELECT * FROM plant_nodes
+            WHERE username = %s AND nodeName = %s
+        """
+        cur = mysql.connection.cursor()
+        cur.execute(check_query, (username, node_name))
+        existing_plant = cur.fetchone()
+
+        if existing_plant:
+            cur.close()
+            return jsonify({"error": "Duplicate plant node found"}), 409
+
+        # Insert the new plant node into the database
+        query = """
+            INSERT INTO plant_nodes (
+                username, nodeName, plantSpecies, wateringFrequencyID,
+                lightThresholdID, humidityThresholdID, moistureThresholdID,
+                temperatureThresholdID
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        params = (
+            username,
+            node_name,
+            plant_species,
+            watering_frequency_id,
+            light_threshold_id,
+            humidity_threshold_id,
+            moisture_threshold_id,
+            temperature_threshold_id,
+        )
+
+        cur.execute(query, params)
+        mysql.connection.commit()
+        cur.close()
+
+        return jsonify({"message": "Plant node registered successfully!"}), 201
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
