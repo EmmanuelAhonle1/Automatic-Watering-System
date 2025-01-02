@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS watering_frequencies (
-    frequencyID INT AUTO_INCREMENT,
+    wateringFrequencyID INT AUTO_INCREMENT,
     frequency_name VARCHAR(50) NOT NULL UNIQUE,
     hours_between_watering INT NOT NULL,
     description TEXT,
-    PRIMARY KEY (frequencyID)
+    PRIMARY KEY (wateringFrequencyID)
 );
 
 -- Example insert statements for common frequencies:

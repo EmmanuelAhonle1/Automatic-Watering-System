@@ -408,6 +408,34 @@ void WiFiManager::setupConfigRoutes()
         String jsonResponse;
         serializeJson(doc, jsonResponse);
         server.send(200, "application/json", jsonResponse); });
+
+    server.on("/update-credentials", HTTP_POST, [this]()
+              {
+    if (server.hasArg("plain") == false) {
+        server.send(400, "application/json", "{\"error\":\"Body not received\"}");
+        return;
+    }
+
+    String body = server.arg("plain");
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, body);
+
+    if (error) {
+        server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+        return;
+    }
+
+    String ssid = doc["ssid"];
+    String password = doc["password"];
+
+    deviceManager->updateAllCredentials(doc);
+
+    server.send(200, "application/json", "{\"message\":\"Credentials updated\"}"); });
+
+    server.on("/get-MAC", HTTP_GET, [this]()
+              {
+        String mac = WiFi.macAddress();
+        server.send(200, "application/json", "{\"macAddress\":\"" + mac + "\"}"); });
 }
 
 // Connect to a WiFi network

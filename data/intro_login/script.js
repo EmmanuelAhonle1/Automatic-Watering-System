@@ -45,6 +45,7 @@ function validateForm(event) {
   // Get form values
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
+  const rememberMe = document.getElementById("remember").checked;
   let isValid = true;
 
   // Validate username
@@ -76,6 +77,7 @@ function validateForm(event) {
             body: JSON.stringify({
               username,
               password: hashedPassword,
+              rememberMe,
             }),
           }
         );

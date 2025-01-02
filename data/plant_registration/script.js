@@ -121,21 +121,38 @@ function updateSettings() {
   }
 }
 
+async function getMacAddress() {
+  try {
+    const response = await fetch(`/get-MAC`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    return data.macAddress;
+  } catch (error) {
+    console.error("Error fetching MAC address:", error);
+  }
+}
+
+settings = {};
 // Save settings
 function saveSettings(event) {
-  event.preventDefault();
+  //event.preventDefault();
 
-  const settings = {
+  settings = {
     nodeName: document.getElementById("nodeName").value,
     plantSpecies:
       document.getElementById("plantSpecies").value === "custom"
         ? document.getElementById("customSpecies").value
         : document.getElementById("plantSpecies").value,
-    wateringFrequency: document.getElementById("wateringFrequency").value,
-    thresholdLight: document.getElementById("thresholdLight").value,
-    thresholdHumidity: document.getElementById("thresholdHumidity").value,
-    thresholdMoisture: document.getElementById("thresholdMoisture").value,
-    thresholdTemperature: document.getElementById("thresholdTemperature").value,
+    wateringFrequencyID: document.getElementById("wateringFrequency").value,
+    lightThresholdID: document.getElementById("thresholdLight").value,
+    humidityThresholdID: document.getElementById("thresholdHumidity").value,
+    moistureThresholdID: document.getElementById("thresholdMoisture").value,
+    temperatureThresholdID: document.getElementById("thresholdTemperature")
+      .value,
   };
 
   // Validate all fields are filled
@@ -150,7 +167,6 @@ function saveSettings(event) {
 
   // Here you would typically send the settings to your plant node
   console.log("Settings saved:", settings);
-  alert("Settings saved successfully!");
 
   return false;
 }
@@ -166,7 +182,56 @@ function resetForm() {
 // Load saved settings when page loads
 document.addEventListener("DOMContentLoaded", loadSavedSettings);
 
-function validateForm(event) {
+async function submitForm() {
+  saveSettings();
+  // Here you would typically send the data to a server
+
+  try {
+    const macAddress = await getMacAddress();
+    settings.macAddress = macAddress;
+    console.log("Submitting form:", settings);
+
+    console.log("MAC Address: " + settings.macAddress);
+
+    // TODO: Add function for calling the API to register the plant node; replace simulation
+    const response = await fetch(
+      `https://automatic-watering-system-api-e673f34a5955.herokuapp.com/plantNode/newPlantNode`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          nodeName: settings.nodeName,
+          plantSpecies: settings.plantSpecies,
+          wateringFrequencyID: settings.wateringFrequencyID,
+          lightThresholdID: settings.lightThresholdID,
+          humidityThresholdID: settings.humidityThresholdID,
+          moistureThresholdID: settings.moistureThresholdID,
+          temperatureThresholdID: settings.temperatureThresholdID,
+          macAddress: settings.macAddress, // Include the macAddress here
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (!data.error) {
+      alert("Plant node registered successfully!");
+    } else {
+      alert("Error registering plant node: " + data.error);
+    }
+
+    // Clear form
+    document.getElementById("registrationForm").reset();
+    toggleCustomFrequency(); // Hide custom frequency input
+    console.log("Form submitted:", data);
+  } catch (error) {
+    console.error("Error submitting form:", error);
+  }
+}
+
+async function validateForm(event) {
   event.preventDefault();
 
   // Reset error messages
@@ -206,48 +271,7 @@ function validateForm(event) {
   }
 
   if (isValid) {
-    // Here you would typically send the data to a server
-    console.log("Form submitted:", {
-      nodeName,
-      plantSpecies,
-      wateringFrequency,
-      customFrequency,
-    });
-
-    // Simulate registration success
-    uName = getCookies("username");
-
-    alert("Plant node registered successfully!");
-
-    // TODO: Create function to retrieve UUID for the user using the username
-
-    // TODO: Add function for calling the API to register the plant node; replace simulation
-    fetch(
-      `https://automatic-watering-system-api-e673f34a5955.herokuapp.com/plantNode/registerPlantNode/${uName}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nodeName: nodeName,
-          plantSpecies: plantSpecies,
-          wateringFrequency: wateringFrequency,
-          customFrequency: customFrequency,
-        }),
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-
-    // Clear form
-    document.getElementById("registrationForm").reset();
-    toggleCustomFrequency(); // Hide custom frequency input
+    submitForm();
   }
 
   return false;
