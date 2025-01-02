@@ -22,11 +22,12 @@ def allowed_origin(origin):
     if not origin:
         return False
 
-    # Regex pattern for http://{ipaddr} format
-    http_ip_pattern = r"^http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$"
-
-    # Also allow specific domains like localhost
-    allowed_patterns = [http_ip_pattern, r"^http://localhost(:\d+)?$"]
+    # Allow your frontend domain explicitly
+    allowed_patterns = [
+        r"^http://192\.168\.1\.240(:\d+)?$",  # Add this
+        r"^http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$",
+        r"^http://localhost(:\d+)?$",
+    ]
 
     return any(re.match(pattern, origin) for pattern in allowed_patterns)
 
@@ -317,6 +318,7 @@ def login():
                     secure=False,
                     samesite="Lax",
                     max_age=7 * 24 * 60 * 60,  # 7 days
+                    domain="automatic-watering-system-api-e673f34a5955.herokuapp.com",
                 )
                 logging.info(
                     "Set-Cookie header: " + str(response.headers.get("Set-Cookie"))
