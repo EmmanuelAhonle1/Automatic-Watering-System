@@ -326,11 +326,12 @@ def login():
             cur.close()
 
             if user:
-                session.permanent = True
-                session["username"] = data["username"]
-                session["last_activity"] = datetime.now().isoformat()
-                logging.info(f"User {data['username']} logged in successfully")
-                logging.info(f"Session after login: {session}")  # Add this
+                if data["rememberMe"]:
+                    session.permanent = True
+                    session["username"] = data["username"]
+                    session["last_activity"] = datetime.now().isoformat()
+                    logging.info(f"User {data['username']} logged in successfully")
+                    logging.info(f"Session after login: {session}")  # Add this
 
                 return (
                     jsonify(
