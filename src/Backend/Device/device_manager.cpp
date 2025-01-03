@@ -37,7 +37,7 @@ bool DeviceManager::updateStoredName(const String &newName)
     if (!LittleFS.exists("/credentials.json"))
     {
         // If file doesn't exist, create new one with just the name
-        DynamicJsonDocument doc(512);
+        StaticJsonDocument<512> doc;
         doc["nodeName"] = newName;
 
         File file = LittleFS.open("/credentials.json", "w");
@@ -60,7 +60,7 @@ bool DeviceManager::updateStoredName(const String &newName)
         return false;
     }
 
-    DynamicJsonDocument doc(512);
+    StaticJsonDocument<512> doc;
     DeserializationError error = deserializeJson(doc, file);
     file.close();
 
@@ -156,6 +156,7 @@ void DeviceManager::begin()
 
 void DeviceManager::updateAllCredentials(JsonDocument creds)
 {
+    delay(3000);
     JsonDocument doc;
     if (LittleFS.exists("/credentials.json"))
     {
@@ -172,16 +173,15 @@ void DeviceManager::updateAllCredentials(JsonDocument creds)
             }
         }
     }
-    JsonDocument newDoc = creds[0];
-    doc["nodeName"] = newDoc["nodeName"];
-    doc["plantNodeUUID"] = newDoc["plantNodeUUID"];
-    doc["connectedUserUUID"] = newDoc["connectedUserUUID"];
-    doc["plantSpecies"] = newDoc["plantSpecies"];
-    doc["wateringFrequencyID"] = newDoc["wateringFrequencyID"];
-    doc["lightThresholdID"] = newDoc["lightThresholdID"];
-    doc["humidityThresholdID"] = newDoc["humidityThresholdID"];
-    doc["moistureThresholdID"] = newDoc["moistureThresholdID"];
-    doc["temperatureThresholdID"] = newDoc["temperatureThresholdID"];
+    doc["nodeName"] = creds["nodeName"];
+    doc["plantNodeUUID"] = creds["plantNodeUUID"];
+    doc["connectedUserUUID"] = creds["connectedUserUUID"];
+    doc["plantSpecies"] = creds["plantSpecies"];
+    doc["wateringFrequencyID"] = creds["wateringFrequencyID"];
+    doc["lightThresholdID"] = creds["lightThresholdID"];
+    doc["humidityThresholdID"] = creds["humidityThresholdID"];
+    doc["moistureThresholdID"] = creds["moistureThresholdID"];
+    doc["temperatureThresholdID"] = creds["temperatureThresholdID"];
 
     File file = LittleFS.open("/credentials.json", "w");
     serializeJson(doc, file);

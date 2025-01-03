@@ -469,11 +469,12 @@ bool WiFiManager::connect(const String &ssid, const String &password)
 
     if (WiFi.status() == WL_CONNECTED)
     {
-        delay(500);
+        delay(1500);
         JsonDocument response = getPlantNodeSettings();
+        Serial.println("Response: " + response[0].as<String>());
         if (!response.isNull())
         {
-            deviceManager->updateAllCredentials(response);
+            deviceManager->updateAllCredentials(response[0]);
         }
     }
 
