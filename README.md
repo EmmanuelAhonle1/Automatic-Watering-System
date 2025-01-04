@@ -1,6 +1,7 @@
 # Automatic Watering System
 
 ## Overview
+
 The Automatic Watering System is a smart IoT solution for plant care, built using ESP8266 microcontrollers. The system provides automated plant monitoring and watering capabilities with a web-based interface for configuration and monitoring.
 
 ## Hardware Components
@@ -12,6 +13,10 @@ The Automatic Watering System is a smart IoT solution for plant care, built usin
 - LC709203F Battery Level Sensor (Pin D4)
 - RGB Status LED (Pins D0, D1, D2)
 - All components are defined in `Pinouts.hpp`
+
+## Setup (IMPORTANT!!!)
+
+For detailed setup instructions, check out the [setup guide](docs/setup.md).
 
 ## Features
 
@@ -53,11 +58,13 @@ RGB LED status indicators for:
 Three main interfaces:
 
 1. WiFi Configuration (`/wifi_config/`)
+
    - Network scanning
    - Connection management
    - Status display
 
 2. User Authentication (`/intro_login/`)
+
    - User login
    - New user registration
    - Session management
@@ -72,22 +79,26 @@ Three main interfaces:
 ### Core Components
 
 1. **WiFi Manager** (`wifi_manager.hpp`, `wifi_manager.cpp`)
+
    - Handles all network connectivity
    - Manages access point and station modes
    - Implements captive portal
    - Handles OTA updates
 
 2. **Device Manager** (`device_manager.hpp`, `device_manager.cpp`)
+
    - Manages device identification
    - Handles configuration storage
    - Coordinates settings updates
 
 3. **Data Acquisition** (`dataAcquisition.hpp`, `dataAcquisition.cpp`)
+
    - Interfaces with all sensors
    - Provides unified data reading interface
    - Handles sensor calibration and thresholds
 
 4. **Database Communication** (`DatabaseCommands.hpp`, `DatabaseCommands.cpp`)
+
    - Manages API interactions
    - Handles data synchronization
    - Implements connection monitoring
@@ -102,11 +113,13 @@ Three main interfaces:
 The system provides three main web interfaces:
 
 1. **WiFi Configuration**
+
    - Network scanning and selection
    - Password input
    - Connection status display
 
 2. **User Authentication**
+
    - Login interface
    - Registration form
    - Session management
@@ -190,6 +203,7 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 ### Common Issues
 
 1. Connection Failures
+
    - Check WiFi credentials
    - Verify API availability
    - Monitor LED status
@@ -206,7 +220,6 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 3. Submit a pull request
 
 ## License
-
 
 ## Authors
 
