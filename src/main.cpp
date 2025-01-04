@@ -25,10 +25,6 @@ Ticker timer;
 #define LED_BUILTIN D4
 bool ledState = false;
 
-void timerISR()
-{
-  rgbStateHandler.handleState(currentState::WIFI_CONNECTED);
-}
 void setup()
 {
   Serial.begin(115200);
@@ -40,7 +36,8 @@ void setup()
     Serial.println("Failed to mount file system");
     return;
   }
-  timer.attach_ms(100, timerISR);
+  timer.attach_ms(100, []()
+                  { rgbStateHandler.updateRGBStateISR(); });
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);

@@ -11,7 +11,7 @@ public:
     /**
      * @brief Ping the database to check if the API endpoint is reachable.
      */
-    static void pingDatabase();
+    static bool pingDatabase();
 
     /**
      * @brief Get the plant node settings using the device's MAC address.

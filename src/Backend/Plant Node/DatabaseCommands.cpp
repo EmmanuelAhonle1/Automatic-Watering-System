@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 
-void DatabaseCommands::pingDatabase()
+bool DatabaseCommands::pingDatabase()
 {
     const std::string endpoint = "/";
     const std::string query = "";
@@ -16,10 +16,12 @@ void DatabaseCommands::pingDatabase()
     if (!response.empty())
     {
         Serial.println("Database ping successful: " + String(response.c_str()));
+        return true;
     }
     else
     {
         Serial.println("Database ping failed.");
+        return false;
     }
 }
 
@@ -37,7 +39,7 @@ StaticJsonDocument<512> DatabaseCommands::getPlantNodeSettings()
 
     std::string response = sendGetRequest("/plantNode/select", queryBuilder);
 
-        if (!response.empty())
+    if (!response.empty())
     {
         DeserializationError error = deserializeJson(plantNodeSettings, response);
         if (error)

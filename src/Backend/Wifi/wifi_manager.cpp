@@ -119,7 +119,7 @@ void WiFiManager::handleClient()
     ArduinoOTA.handle();
 
     DatabaseCommands::pingDatabase();
-    delay(200);
+    // delay(200);
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;
