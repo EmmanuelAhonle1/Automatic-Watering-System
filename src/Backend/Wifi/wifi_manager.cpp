@@ -1,19 +1,16 @@
 #include "wifi_manager.hpp"
 #include <DNSServer.h>
 #include "OTAManager.hpp"
-#include "../Database/dbConnection.hpp"
 #include <Arduino.h>
 #include <string>
 #include "../Device/device_manager.hpp"
 #include "../DB Query Creator/dbQueryCreator.hpp"
 #include "../Plant Node/PlantNode.hpp"
+#include "../Plant Node/DatabaseCommands.hpp"
 
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
-
-#ifdef USING_DBCONNECTION
-#endif
 
 #define LED_BUILTIN 2
 
@@ -86,8 +83,8 @@ void WiFiManager::begin()
 
             if (!error)
             {
-                String ssid = creds["ssid"].as<String>();
-                String password = creds["password"].as<String>();
+                String ssid = creds["wifi_settings"]["ssid"].as<String>();
+                String password = creds["wifi_settings"]["password"].as<String>();
 
                 connected = connect(ssid, password);
                 if (connected)
@@ -114,19 +111,15 @@ void WiFiManager::begin()
     setupArduinoOTA();
 }
 
-void WiFiManager::pingWiFi()
-{
-    WiFi.status() == WL_CONNECTED ? digitalWrite(LED_BUILTIN, LOW) : digitalWrite(LED_BUILTIN, HIGH);
-}
-
 // Handle client requests
 void WiFiManager::handleClient()
 {
     dnsServer.processNextRequest();
     server.handleClient();
     ArduinoOTA.handle();
-    // pingWiFi();
-    // pingDatabase();
+
+    DatabaseCommands::pingDatabase();
+    delay(200);
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;
@@ -433,8 +426,7 @@ void WiFiManager::setupConfigRoutes()
 
     String ssid = doc["ssid"];
     String password = doc["password"];
-
-    deviceManager->updateAllCredentials(doc);
+    
 
     server.send(200, "application/json", "{\"message\":\"Credentials updated\"}"); });
 
@@ -460,22 +452,22 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     WiFi.hostname(deviceManager->getSSID());
 
     int attempts = 0;
+    Serial.print("Connecting");
     while (WiFi.status() != WL_CONNECTED && attempts < 10)
     {
-        Serial.println(".");
+        Serial.print(".");
         delay(1000);
         attempts++;
     }
+    Serial.println();
 
+    // TODO: update this
     if (WiFi.status() == WL_CONNECTED)
     {
-        delay(1500);
-        JsonDocument response = getPlantNodeSettings();
-        Serial.println("Response: " + response[0].as<String>());
-        if (!response.isNull())
-        {
-            deviceManager->updateAllCredentials(response[0]);
-        }
+        StaticJsonDocument response = DatabaseCommands::getPlantNodeSettings();
+        String responseString;
+        serializeJson(response, responseString);
+        Serial.println(responseString);
     }
 
     return WiFi.status() == WL_CONNECTED;
@@ -494,8 +486,8 @@ void WiFiManager::reconnectWiFi()
 
             if (!error)
             {
-                String ssid = creds["ssid"].as<String>();
-                String password = creds["password"].as<String>();
+                String ssid = creds["wifi_settings"]["ssid"].as<String>();
+                String password = creds["wifi_settings"]["password"].as<String>();
 
                 if (connect(ssid, password))
                 {

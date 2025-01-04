@@ -21,13 +21,6 @@ public:
      * @param newName The new device name.
      * @return bool True if the update was successful, false otherwise.
      */
-    bool updateStoredName(const String &newName);
-
-    /**
-     * @brief Read the device name from the credentials file.
-     *
-     * @return String The stored device name.
-     */
     String readNameFromCredentials();
 
     /**
@@ -36,11 +29,11 @@ public:
     void begin();
 
     /**
-     * @brief Update all credentials in the credentials file.
+     * @brief Update plant node settings in the credentials file.
      *
-     * @param creds The JSON document containing the credentials to update.
+     * @param creds The JSON document containing the plant node settings to update.
      */
-    void updateAllCredentials(JsonDocument creds);
+    void updatePlantNodeSettings(const StaticJsonDocument<4096> &creds);
 
     /**
      * @brief Get the SSID from the credentials file.
@@ -55,6 +48,13 @@ public:
      * @return String The device name.
      */
     String getDeviceName() { return deviceName; };
+
+    void updateWifiSettings(const String &ssid, const String &password, const String &macAddress);
+
+    /**
+     * @brief Print the JSON content of the credentials file.
+     */
+    void printCredentialsJson();
 
 private:
     String deviceName;

@@ -52,17 +52,17 @@ public:
     /**
      * @brief Build the complete URL with parameters and return fields.
      *
+     * @param endpoint The endpoint to append to the base URL.
      * @return std::string The complete URL.
      */
-    std::string build() const;
+    std::string build(const std::string &endpoint) const;
 
     /**
-     * @brief Form the URL with the given endpoint.
+     * @brief Get the query string with parameters and return fields.
      *
-     * @param endpoint The endpoint to append to the base URL.
-     * @return std::string The complete URL with the endpoint.
+     * @return std::string The query string.
      */
-    std::string formURLWithEndpoint(const std::string &endpoint) const;
+    std::string getQueryString() const;
 
 private:
     std::string baseUrl = API_URL;                              // Base URL for the API
@@ -84,18 +84,18 @@ private:
  * @brief Send an HTTP GET request.
  *
  * @param endpoint The endpoint to send the request to.
- * @param query The query string to append to the URL.
+ * @param queryBuilder The query builder to build the URL.
  * @return string The response from the server.
  */
-string sendGetRequest(const string &endpoint, const string &query);
+string sendGetRequest(const string &endpoint, const URLQueryBuilder &queryBuilder);
 
 /**
  * @brief Send an HTTP POST request.
  *
  * @param endpoint The endpoint to send the request to.
- * @param query The query string to append to the URL.
+ * @param queryBuilder The query builder to build the URL.
  * @return string The response from the server.
  */
-string sendPostRequest(const string &endpoint, const string &query);
+string sendPostRequest(const string &endpoint, const URLQueryBuilder &queryBuilder);
 
 #endif // DB_QUERY_CREATOR_HPP
