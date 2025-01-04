@@ -16,10 +16,9 @@ public:
     String generateDeviceName();
 
     /**
-     * @brief Update the stored device name in the credentials file.
+     * @brief Read the stored device name from the credentials file.
      *
-     * @param newName The new device name.
-     * @return bool True if the update was successful, false otherwise.
+     * @return String The stored device name.
      */
     String readNameFromCredentials();
 
@@ -49,6 +48,13 @@ public:
      */
     String getDeviceName() { return deviceName; };
 
+    /**
+     * @brief Update WiFi settings in the credentials file.
+     *
+     * @param ssid The SSID of the network.
+     * @param password The password of the network.
+     * @param macAddress The MAC address of the device.
+     */
     void updateWifiSettings(const String &ssid, const String &password, const String &macAddress);
 
     /**

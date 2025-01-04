@@ -5,7 +5,6 @@
 #include <string>
 #include "../Device/device_manager.hpp"
 #include "../DB Query Creator/dbQueryCreator.hpp"
-#include "../Plant Node/PlantNode.hpp"
 #include "../Plant Node/DatabaseCommands.hpp"
 
 using namespace std;
@@ -118,18 +117,20 @@ void WiFiManager::handleClient()
     server.handleClient();
     ArduinoOTA.handle();
 
-    DatabaseCommands::pingDatabase();
-    // delay(200);
+    // Only ping database if we're connected to WiFi
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        DatabaseCommands::pingDatabase();
+    }
 
     // Check WiFi connection status and attempt to reconnect if disconnected
     bool savedCredentials = false;
-    // Check for saved WiFi credentials
     if (LittleFS.exists("/credentials.json"))
     {
         File file = LittleFS.open("/credentials.json", "r");
         if (file)
         {
-            JsonDocument creds; // Use StaticJsonDocument
+            JsonDocument creds;
             DeserializationError error = deserializeJson(creds, file);
             file.close();
 
@@ -137,21 +138,12 @@ void WiFiManager::handleClient()
             {
                 String ssid = creds["ssid"].as<String>();
                 String password = creds["password"].as<String>();
-
-                if (ssid.isEmpty() && password.isEmpty())
-                {
-                    Serial.println("No saved credentials found");
-                }
-                else
-                {
-                    Serial1.println("Saved credentials found");
-                    savedCredentials = true;
-                }
+                savedCredentials = !ssid.isEmpty() && !password.isEmpty();
             }
         }
     }
 
-    if (WiFi.status() != WL_CONNECTED && !savedCredentials)
+    if (WiFi.status() != WL_CONNECTED && savedCredentials)
     {
         Serial.println("WiFi disconnected. Attempting to reconnect...");
         reconnectWiFi();

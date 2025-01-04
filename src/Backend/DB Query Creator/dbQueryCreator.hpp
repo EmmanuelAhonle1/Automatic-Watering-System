@@ -85,7 +85,7 @@ private:
  *
  * @param endpoint The endpoint to send the request to.
  * @param queryBuilder The query builder to build the URL.
- * @return string The response from the server.
+     * @return string The response from the server.
  */
 string sendGetRequest(const string &endpoint, const URLQueryBuilder &queryBuilder);
 

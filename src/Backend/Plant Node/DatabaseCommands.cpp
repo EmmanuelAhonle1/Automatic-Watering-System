@@ -5,24 +5,37 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 
+bool DatabaseCommands::lastPingStatus = false;
+unsigned long DatabaseCommands::lastPingTime = 0;
+
 bool DatabaseCommands::pingDatabase()
 {
-    const std::string endpoint = "/";
-    const std::string query = "";
+    unsigned long currentTime = millis();
 
-    URLQueryBuilder queryBuilder("", ""); // No authentication needed for this example
-    std::string response = sendGetRequest(endpoint, queryBuilder);
+    // Only ping if enough time has elapsed since last ping
+    if (currentTime - lastPingTime >= PING_INTERVAL)
+    {
+        lastPingTime = currentTime;
 
-    if (!response.empty())
-    {
-        Serial.println("Database ping successful: " + String(response.c_str()));
-        return true;
+        const std::string endpoint = "/";
+        URLQueryBuilder queryBuilder("", "");
+        std::string response = sendGetRequest(endpoint, queryBuilder);
+
+        lastPingStatus = !response.empty();
+
+#ifdef DEBUG_DB_COMMANDS
+        if (lastPingStatus)
+        {
+            Serial.println("Database ping successful");
+        }
+        else
+        {
+            Serial.println("Database ping failed");
+        }
+#endif
     }
-    else
-    {
-        Serial.println("Database ping failed.");
-        return false;
-    }
+
+    return lastPingStatus;
 }
 
 StaticJsonDocument<512> DatabaseCommands::getPlantNodeSettings()

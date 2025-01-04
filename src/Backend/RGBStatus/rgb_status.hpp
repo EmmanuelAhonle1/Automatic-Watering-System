@@ -18,20 +18,55 @@ enum class currentState
     CONNECTION_LOST,
     RECONNECTING
 };
-// In rgb_status.hpp
+
 class RGBStateHandler
 {
 public:
+    /**
+     * @brief Update the RGB state in an ISR
+     */
     void updateRGBStateISR();
+
+    /**
+     * @brief Set the current state
+     * 
+     * @param state The new state
+     */
     void setCurrentState(currentState state);
+
+    /**
+     * @brief Get the current state
+     * 
+     * @return currentState The current state
+     */
     currentState getCurrentState();
 
 private:
     currentState prevState;
     currentState currState;
     static bool ledState;
+
+    /**
+     * @brief Set the RGB color
+     * 
+     * @param r Red value
+     * @param g Green value
+     * @param b Blue value
+     */
     void setRGBColor(int r, int g, int b);
+
+    /**
+     * @brief Get the RGB color
+     * 
+     * @return vector<int> The RGB color values
+     */
     vector<int> getRGBColor();
+
+    /**
+     * @brief Check if the RGB is on
+     * 
+     * @return true if RGB is on, false otherwise
+     */
     bool rgbOn();
 
     int rValue = 0;
@@ -39,4 +74,4 @@ private:
     int bValue = 0;
 };
 
-#endif
+#endif // RGB_STATUS_HPP

@@ -11,8 +11,8 @@ void RGBStateHandler::updateRGBStateISR()
     // Check WiFi Status
     if (WiFi.status() == WL_CONNECTED)
     {
-        // Check MySQL connection by attempting to ping
-        if (DatabaseCommands::pingDatabase())
+        // Use cached ping status instead of pinging directly
+        if (DatabaseCommands::getLastPingStatus())
         {
             currState = currentState::MYSQL_SERVER_CONNECTED;
         }
