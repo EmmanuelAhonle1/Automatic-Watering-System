@@ -42,7 +42,7 @@ CREATE TABLE `plant_nodes` (
   CONSTRAINT `plant_nodes_ibfk_5` FOREIGN KEY (`temperatureThresholdID`) REFERENCES `threshold-temperature` (`temperatureThresholdID`),
   CONSTRAINT `valid_mac` CHECK (regexp_like(`macAddress`,_utf8mb4''^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$'')),
   CONSTRAINT `valid_moisture` CHECK (((`soilMoisture` >= 0) and (`soilMoisture` <= 100)))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
