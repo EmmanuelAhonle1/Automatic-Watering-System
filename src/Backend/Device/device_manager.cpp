@@ -119,6 +119,8 @@ void DeviceManager::begin()
     {
         // Use existing name
         deviceName = storedName;
+        printCredentialsJson();
+
         Serial.println("Using existing name: " + deviceName);
     }
 }
@@ -173,7 +175,7 @@ void DeviceManager::updateWifiSettings(const String &ssid, const String &passwor
 
 void DeviceManager::updatePlantNodeSettings(const StaticJsonDocument<512> &creds) // Added & to prevent copying
 {
-    StaticJsonDocument<4096> doc;
+    StaticJsonDocument<512> doc;
 
     // Read existing file
     if (LittleFS.exists("/credentials.json"))

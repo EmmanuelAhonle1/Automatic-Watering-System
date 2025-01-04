@@ -365,40 +365,37 @@ void WiFiManager::setupConfigRoutes()
     // Handle WiFi connection requests
     server.on("/wifi-connect", HTTP_POST, [this]()
               {
-        String ssid = server.arg("ssid");
-        String password = server.arg("password");
-        
-        JsonDocument response;
-        
-        if (ssid.length() == 0) {
-            response["success"] = false;
-            response["message"] = "SSID cannot be empty";
-        } else {
-            if (connect(ssid, password)) {
-                response["success"] = true;
-                response["message"] = "Connected to " + ssid;
-                response["ip"] = WiFi.localIP().toString();
-                
-
-                // Save credentials
-                File file = LittleFS.open("/credentials.json", "w");
-                if (file) {
-                    JsonDocument creds;
-                    creds["ssid"] = ssid;
-                    creds["password"] = password;
-                    creds["nodeName"] = deviceManager->getSSID();
-                    serializeJson(creds, file);
-                    file.close();
-                }
-            } else {
-                response["success"] = false;
-                response["message"] = "Failed to connect to " + ssid;
+    String ssid = server.arg("ssid");
+    String password = server.arg("password");
+    
+    JsonDocument response;
+    
+    if (ssid.length() == 0) {
+        response["success"] = false;
+        response["message"] = "SSID cannot be empty";
+    } else {
+        if (connect(ssid, password)) {
+            response["success"] = true;
+            response["message"] = "Connected to " + ssid;
+            response["ip"] = WiFi.localIP().toString();
+            
+            // Use existing methods to update credentials properly
+            deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
+            
+            // Fetch and update plant settings from database
+            StaticJsonDocument<512> plantSettings = DatabaseCommands::getPlantNodeSettings();
+            if (plantSettings.size() > 0) {  // Check if we got valid settings
+                deviceManager->updatePlantNodeSettings(plantSettings[0]);
             }
+        } else {
+            response["success"] = false;
+            response["message"] = "Failed to connect to " + ssid;
         }
-        
-        String jsonResponse;
-        serializeJson(response, jsonResponse);
-        server.send(200, "application/json", jsonResponse); });
+    }
+    
+    String jsonResponse;
+    serializeJson(response, jsonResponse);
+    server.send(200, "application/json", jsonResponse); });
 
     // Handle WiFi scan requests
     server.on("/wifi-scan", HTTP_GET, [this]()
