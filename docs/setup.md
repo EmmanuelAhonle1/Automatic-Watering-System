@@ -15,14 +15,14 @@ Make sure you have the following installed:
 
 Run the SQL scripts provided in the `database` directory. Execute them in the following order:
 
-1. `threshold-humidity.sql`
-2. `threshold-light-sensitivity.sql`
-3. `threshold-soil-moisture.sql`
-4. `threshold-temperature.sql`
-5. `watering_frequencies.sql`
-6. `users.sql`
-7. `plant_nodes.sql`
-8. `triggers.sql`
+1. `Humidity.sql`
+2. `Light Sensitivity.sql`
+3. `Soil Moisture.sql`
+4. `Temperature.sql`
+5. `Watering Frequency Table Creator.sql`
+6. `User Table Creator.sql`
+7. `Plant Node Table Creator.sql`
+8. `Triggers.sql`
 
 These scripts will:
 
