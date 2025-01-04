@@ -33,7 +33,7 @@ public:
      *
      * @param creds The JSON document containing the plant node settings to update.
      */
-    void updatePlantNodeSettings(const StaticJsonDocument<4096> &creds);
+    void updatePlantNodeSettings(const StaticJsonDocument<512> &creds);
 
     /**
      * @brief Get the SSID from the credentials file.

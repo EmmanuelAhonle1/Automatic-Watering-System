@@ -37,7 +37,7 @@ StaticJsonDocument<512> DatabaseCommands::getPlantNodeSettings()
 
     std::string response = sendGetRequest("/plantNode/select", queryBuilder);
 
-    if (!response.empty())
+        if (!response.empty())
     {
         DeserializationError error = deserializeJson(plantNodeSettings, response);
         if (error)

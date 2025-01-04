@@ -464,10 +464,9 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     // TODO: update this
     if (WiFi.status() == WL_CONNECTED)
     {
+        deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
         StaticJsonDocument response = DatabaseCommands::getPlantNodeSettings();
-        String responseString;
-        serializeJson(response, responseString);
-        Serial.println(responseString);
+        deviceManager->updatePlantNodeSettings(response[0]);
     }
 
     return WiFi.status() == WL_CONNECTED;

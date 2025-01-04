@@ -171,7 +171,7 @@ void DeviceManager::updateWifiSettings(const String &ssid, const String &passwor
     printCredentialsJson();
 }
 
-void DeviceManager::updatePlantNodeSettings(const StaticJsonDocument<4096> &creds) // Added & to prevent copying
+void DeviceManager::updatePlantNodeSettings(const StaticJsonDocument<512> &creds) // Added & to prevent copying
 {
     StaticJsonDocument<4096> doc;
 
