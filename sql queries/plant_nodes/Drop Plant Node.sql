@@ -1,3 +1,2 @@
-DELETE FROM plant_nodes 
-WHERE plantNodeUUID = 'pn-specific-uuid-here'
-AND macAddress REGEXP '^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$';  -- Ensure MAC address format
+DELETE FROM plant_nodes
+WHERE plantNodeUUID = 'pn-1234abcd-5678-efgh-ijkl-9012mnopqrst';

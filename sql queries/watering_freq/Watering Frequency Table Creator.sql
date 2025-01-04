@@ -1,10 +1,11 @@
-CREATE TABLE IF NOT EXISTS watering_frequencies (
-    wateringFrequencyID INT AUTO_INCREMENT,
-    frequency_name VARCHAR(50) NOT NULL UNIQUE,
-    hours_between_watering INT NOT NULL,
-    description TEXT,
-    PRIMARY KEY (wateringFrequencyID)
-);
+CREATE TABLE `watering_frequencies` (
+  `wateringFrequencyID` int NOT NULL,
+  `frequency_name` varchar(50) NOT NULL,
+  `hours_between_watering` int NOT NULL,
+  `description` text,
+  PRIMARY KEY (`wateringFrequencyID`),
+  UNIQUE KEY `frequency_name` (`frequency_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Example insert statements for common frequencies:
 INSERT INTO watering_frequencies (frequency_name, hours_between_watering, description) VALUES

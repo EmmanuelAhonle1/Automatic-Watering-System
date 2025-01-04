@@ -1,12 +1,13 @@
 -- Light Sensitivity Thresholds
-CREATE TABLE IF NOT EXISTS `threshold-light-sensitivity` (
-   lightThresholdID INT AUTO_INCREMENT,
-   threshold_name VARCHAR(50) NOT NULL UNIQUE,
-   min_light_level INT NOT NULL,
-   max_light_level INT NOT NULL,
-   description TEXT,
-   PRIMARY KEY (lightThresholdID)
-);
+CREATE TABLE `threshold-light-sensitivity` (
+  `lightThresholdID` int NOT NULL AUTO_INCREMENT,
+  `threshold_name` varchar(50) NOT NULL,
+  `min_light_level` int NOT NULL,
+  `max_light_level` int NOT NULL,
+  `description` text,
+  PRIMARY KEY (`lightThresholdID`),
+  UNIQUE KEY `threshold_name` (`threshold_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `threshold-light-sensitivity` (threshold_name, min_light_level, max_light_level, description) VALUES
    ('Low Light', 0, 9, 'Suitable for shade-loving plants'),

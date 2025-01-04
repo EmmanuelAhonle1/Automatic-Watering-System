@@ -1,11 +1,12 @@
-CREATE TABLE IF NOT EXISTS `threshold-temperature` (
-   temperatureThresholdID INT AUTO_INCREMENT,
-   threshold_name VARCHAR(50) NOT NULL UNIQUE,
-   min_temperature FLOAT NOT NULL,
-   max_temperature FLOAT NOT NULL,
-   description TEXT,
-   PRIMARY KEY (temperatureThresholdID)
-);
+CREATE TABLE `threshold-temperature` (
+  `temperatureThresholdID` int NOT NULL AUTO_INCREMENT,
+  `threshold_name` varchar(50) NOT NULL,
+  `min_temperature` float NOT NULL,
+  `max_temperature` float NOT NULL,
+  `description` text,
+  PRIMARY KEY (`temperatureThresholdID`),
+  UNIQUE KEY `threshold_name` (`threshold_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `threshold-temperature` (threshold_name, min_temperature, max_temperature, description) VALUES
    ('Cool', 10.0, 18.0, 'Suitable for plants that prefer cooler conditions'),

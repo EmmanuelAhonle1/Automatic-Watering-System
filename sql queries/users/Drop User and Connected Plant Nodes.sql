@@ -1,7 +1,2 @@
-START TRANSACTION;
-    DELETE FROM plant_nodes 
-    WHERE connectedUserUUID = 'usr-specific-uuid-here';
-    
-    DELETE FROM users 
-    WHERE userUUID = 'usr-specific-uuid-here';
-COMMIT;
+DELETE FROM users
+WHERE userUUID = '123e4567-e89b-12d3-a456-426614174000';

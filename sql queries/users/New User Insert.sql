@@ -1,19 +1,25 @@
 INSERT INTO users (
+    userUUID,
     username,
     email,
-    passwordHash,
+    password,
     firstName,
     lastName,
     phoneNumber,
-    -- preferredTemperatureUnit,
-    notificationsEnabled
+    preferredTemperatureUnit,
+    notificationsEnabled,
+    isActive,
+    lastLogin
 ) VALUES (
-    'john_doef',
-    'john.doey@email.com',
-    '$2y$10$abcdefghijklmnopqrstuv',  -- This would be an actual hashed password
+    UUID(),
+    'johndoe',
+    'john.doe@example.com',
+    SHA2('SecurePassword123!', 256),
     'John',
     'Doe',
-    '+1-555-123-4567',
-    -- 'C',
-    TRUE
+    '+1234567890',
+    'F',
+    1,
+    1,
+    NOW()
 );
