@@ -207,8 +207,7 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 
 ## License
 
-[Add your license information here]
 
 ## Authors
 
-[Add author information here]
+Emmanuel Ahonle
