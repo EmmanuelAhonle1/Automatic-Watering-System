@@ -67,46 +67,39 @@ void WiFiManager::disableAccessPoint()
 void WiFiManager::begin()
 {
     bool connected = false;
-    Serial.println("on now");
-    delay(1000);
+    Serial.println("WiFi Manager starting...");
 
-    // Check for saved WiFi credentials
-    if (LittleFS.exists("/credentials.json"))
+    if (checkValidCredentials())
     {
         File file = LittleFS.open("/credentials.json", "r");
-        if (file)
+        JsonDocument creds;
+        deserializeJson(creds, file);
+        file.close();
+
+        String ssid = creds["wifi_settings"]["ssid"].as<String>();
+        String password = creds["wifi_settings"]["password"].as<String>();
+
+        connected = connect(ssid, password);
+        if (connected)
         {
-            JsonDocument creds; // Use StaticJsonDocument
-            DeserializationError error = deserializeJson(creds, file);
-            file.close();
-
-            if (!error)
-            {
-                String ssid = creds["wifi_settings"]["ssid"].as<String>();
-                String password = creds["wifi_settings"]["password"].as<String>();
-
-                connected = connect(ssid, password);
-                if (connected)
-                {
-                    Serial.println("Connected to [" + ssid + "] using saved credentials");
-                }
-            }
+            Serial.println("Connected to [" + ssid + "] using saved credentials");
+        }
+        else
+        {
+            Serial.println("Failed to connect with saved credentials");
         }
     }
 
-    // If no saved credentials or connection failed, start AP mode
     if (!connected)
     {
+        Serial.println("Starting AP mode...");
         setupAccessPoint();
         setupDNS();
     }
 
-    // Always set up the web server to serve the necessary files
     setupConfigRoutes();
     server.begin();
     Serial.println("Web server started");
-
-    // Always set up OTA
     setupArduinoOTA();
 }
 
@@ -123,33 +116,58 @@ void WiFiManager::handleClient()
         DatabaseCommands::pingDatabase();
     }
 
-    // Check WiFi connection status and attempt to reconnect if disconnected
-    bool savedCredentials = false;
-    if (LittleFS.exists("/credentials.json"))
+    // Check if we should try to reconnect
+    if (WiFi.status() != WL_CONNECTED)
     {
-        File file = LittleFS.open("/credentials.json", "r");
-        if (file)
+        bool hasValidCredentials = checkValidCredentials();
+        if (hasValidCredentials)
         {
-            JsonDocument creds;
-            DeserializationError error = deserializeJson(creds, file);
-            file.close();
-
-            if (!error)
-            {
-                String ssid = creds["ssid"].as<String>();
-                String password = creds["password"].as<String>();
-                savedCredentials = !ssid.isEmpty() && !password.isEmpty();
-            }
+            Serial.println("WiFi disconnected. Attempting to reconnect...");
+            reconnectWiFi();
         }
-    }
-
-    if (WiFi.status() != WL_CONNECTED && savedCredentials)
-    {
-        Serial.println("WiFi disconnected. Attempting to reconnect...");
-        reconnectWiFi();
+        else if (WiFi.getMode() != WIFI_AP)
+        {
+            Serial.println("No valid credentials found. Starting AP mode...");
+            setupAccessPoint();
+            setupDNS();
+        }
     }
 }
 
+// Add this new method to check for valid credentials
+bool WiFiManager::checkValidCredentials()
+{
+    if (!LittleFS.exists("/credentials.json"))
+    {
+        return false;
+    }
+
+    File file = LittleFS.open("/credentials.json", "r");
+    if (!file)
+    {
+        return false;
+    }
+
+    JsonDocument creds;
+    DeserializationError error = deserializeJson(creds, file);
+    file.close();
+
+    if (error)
+    {
+        return false;
+    }
+
+    // Check if wifi_settings exists and has non-empty ssid and password
+    if (!creds.containsKey("wifi_settings"))
+    {
+        return false;
+    }
+
+    String ssid = creds["wifi_settings"]["ssid"].as<String>();
+    String password = creds["wifi_settings"]["password"].as<String>();
+
+    return !ssid.isEmpty() && !password.isEmpty();
+}
 // Set up the configuration routes for the web server
 void WiFiManager::setupConfigRoutes()
 {

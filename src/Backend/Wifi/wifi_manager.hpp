@@ -42,7 +42,8 @@ public:
     bool connect(const String &ssid, const String &password);
 
     /**
-     * @brief Reconnect to the WiFi network
+     * @brief
+     *
      */
     void reconnectWiFi();
 
@@ -81,6 +82,13 @@ private:
      * @param content The content of the response
      */
     void sendCaptivePortalSuccess(const String &contentType, const String &content);
+
+    /**
+     * @brief Check if the credentials are valid
+     *
+     * @return true if credentials are valid, false otherwise
+     */
+    bool checkValidCredentials();
 
     DNSServer dnsServer;
     ESP8266WebServer &server;
