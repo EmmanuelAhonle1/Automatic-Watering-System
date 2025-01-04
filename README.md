@@ -179,7 +179,7 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 
 1. Clone the repository
 2. Install required libraries
-3. Configure `config.h` with API credentials
+3. Configure `config.h` with API credentials (Refer to the [setup guide](docs/setup.md))
 4. Build and flash to ESP8266
 
 ## Security Features
