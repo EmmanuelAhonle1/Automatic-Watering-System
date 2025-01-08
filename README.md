@@ -8,10 +8,10 @@ The Automatic Watering System is a smart IoT solution for plant care, built usin
 
 - ESP8266 Microcontroller
 - DHT11 Temperature and Humidity Sensor (Pin D5)
-- Capacitive Soil Moisture Sensor (Pin D6)
-- VEML7700 Ambient Light Sensor (Pin D7)
-- LC709203F Battery Level Sensor (Pin D4)
-- RGB Status LED (Pins D0, D1, D2)
+- Capacitive Soil Moisture Sensor (Pin D3)
+- VEML7700 Ambient Light Sensor (Pins D4(SCL), D9(SDA))
+- LC709203F Battery Level Sensor (Pins D6, D7)
+- RGB Status LED (Pins D0(R), D1(G), D2(B))
 - All components are defined in `Pinouts.hpp`
 
 ## Setup (IMPORTANT!!!)
