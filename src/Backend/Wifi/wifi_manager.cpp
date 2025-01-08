@@ -171,13 +171,17 @@ bool WiFiManager::checkValidCredentials()
 // Set up the configuration routes for the web server
 void WiFiManager::setupConfigRoutes()
 {
-
     // ----------------- WiFi Configuration -----------------
     // Redirect root URL to /wifi_config/index.html
     server.on("/", HTTP_GET, [this]()
               {
-        server.sendHeader("Location", "/wifi_config/index.html", true);
-        server.send(302, "text/plain", ""); });
+        File file = LittleFS.open("/wifi_config/index.html", "r");
+        if (!file) {
+            server.send(404, "text/plain", "Configuration page not found");
+            return;
+        }
+        server.streamFile(file, "text/html");
+        file.close(); });
 
     // Serve the wifi_config HTML file
     server.on("/wifi_config/index.html", HTTP_GET, [this]()
@@ -213,7 +217,6 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Intro Login -----------------
-
     // Serve the intro_login HTML file
     server.on("/intro_login/index.html", HTTP_GET, [this]()
               {
@@ -248,7 +251,6 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Plant Node Registration -----------------
-
     // Serve the plant_node_registration HTML file
     server.on("/plant_registration/index.html", HTTP_GET, [this]()
               {
@@ -283,15 +285,9 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Captive Portal Handler -----------------
-    // Catch-all handler for captive portal
+    // Catch-all handler to redirect all other requests to the configuration page
     server.onNotFound([this]()
                       {
-        String host = server.hostHeader();
-        if (host.length() == 0) {
-            server.send(302, "text/plain", "");
-            return;
-        }
-        
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
@@ -319,24 +315,13 @@ void WiFiManager::setupConfigRoutes()
         delay(1000); // Add delay to allow frontend time to redirect
         disableAccessPoint(); });
 
-    // Captive portal detection endpoints
+    // -------------- Captive portal detection endpoints -----------------------
+    // Essential captive portal endpoints for Windows
     server.on("/connecttest.txt", HTTP_GET, [this]()
-              {
-        if (WiFi.status() == WL_CONNECTED) {
-            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
-        } else {
-            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-            server.send(302, "text/plain", "");
-        } });
+              { sendCaptivePortalSuccess("text/plain", "Microsoft NCSI"); });
 
     server.on("/ncsi.txt", HTTP_GET, [this]()
-              {
-        if (WiFi.status() == WL_CONNECTED) {
-            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
-        } else {
-            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-            server.send(302, "text/plain", "");
-        } });
+              { sendCaptivePortalSuccess("text/plain", "Microsoft NCSI"); });
 
     server.on("/generate_204", HTTP_GET, [this]()
               {
@@ -347,55 +332,51 @@ void WiFiManager::setupConfigRoutes()
             server.send(302, "text/plain", "");
         } });
 
+    // Essential captive portal endpoints for iOS
     server.on("/hotspot-detect.html", HTTP_GET, [this]()
-              {
-    if (WiFi.status() == WL_CONNECTED) {
-        sendCaptivePortalSuccess("text/html", 
-            "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
-    } else {
-        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
-        server.send(302, "text/plain", "");
-    } });
+              { sendCaptivePortalSuccess("text/html",
+                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
 
     server.on("/fwlink", HTTP_GET, [this]()
               {
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
+    // ----------------- WiFi Connection -----------------
     // Handle WiFi connection requests
     server.on("/wifi-connect", HTTP_POST, [this]()
               {
-    String ssid = server.arg("ssid");
-    String password = server.arg("password");
-    
-    JsonDocument response;
-    
-    if (ssid.length() == 0) {
-        response["success"] = false;
-        response["message"] = "SSID cannot be empty";
-    } else {
-        if (connect(ssid, password)) {
-            response["success"] = true;
-            response["message"] = "Connected to " + ssid;
-            response["ip"] = WiFi.localIP().toString();
-            
-            // Use existing methods to update credentials properly
-            deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
-            
-            // Fetch and update plant settings from database
-            StaticJsonDocument<512> plantSettings = DatabaseCommands::getPlantNodeSettings();
-            if (plantSettings.size() > 0) {  // Check if we got valid settings
-                deviceManager->updatePlantNodeSettings(plantSettings[0]);
-            }
-        } else {
+        String ssid = server.arg("ssid");
+        String password = server.arg("password");
+        
+        JsonDocument response;
+        
+        if (ssid.length() == 0) {
             response["success"] = false;
-            response["message"] = "Failed to connect to " + ssid;
+            response["message"] = "SSID cannot be empty";
+        } else {
+            if (connect(ssid, password)) {
+                response["success"] = true;
+                response["message"] = "Connected to " + ssid;
+                response["ip"] = WiFi.localIP().toString();
+                
+                // Use existing methods to update credentials properly
+                deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
+                
+                // Fetch and update plant settings from database
+                StaticJsonDocument<512> plantSettings = DatabaseCommands::getPlantNodeSettings();
+                if (plantSettings.size() > 0) {  // Check if we got valid settings
+                    deviceManager->updatePlantNodeSettings(plantSettings[0]);
+                }
+            } else {
+                response["success"] = false;
+                response["message"] = "Failed to connect to " + ssid;
+            }
         }
-    }
-    
-    String jsonResponse;
-    serializeJson(response, jsonResponse);
-    server.send(200, "application/json", jsonResponse); });
+        
+        String jsonResponse;
+        serializeJson(response, jsonResponse);
+        server.send(200, "application/json", jsonResponse); });
 
     // Handle WiFi scan requests
     server.on("/wifi-scan", HTTP_GET, [this]()
@@ -415,37 +396,35 @@ void WiFiManager::setupConfigRoutes()
         serializeJson(doc, jsonResponse);
         server.send(200, "application/json", jsonResponse); });
 
+    // Handle updating credentials
     server.on("/update-credentials", HTTP_POST, [this]()
               {
-    if (server.hasArg("plain") == false) {
-        server.send(400, "application/json", "{\"error\":\"Body not received\"}");
-        return;
-    }
+        if (server.hasArg("plain") == false) {
+            server.send(400, "application/json", "{\"error\":\"Body not received\"}");
+            return;
+        }
 
-    String body = server.arg("plain");
-    StaticJsonDocument<200> doc;
-    DeserializationError error = deserializeJson(doc, body);
+        String body = server.arg("plain");
+        StaticJsonDocument<200> doc;
+        DeserializationError error = deserializeJson(doc, body);
 
-    if (error) {
-        server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
-        return;
-    }
+        if (error) {
+            server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+            return;
+        }
 
-    String ssid = doc["ssid"];
-    String password = doc["password"];
-    
+        String ssid = doc["ssid"];
+        String password = doc["password"];
+        
+        server.send(200, "application/json", "{\"message\":\"Credentials updated\"}"); });
 
-    server.send(200, "application/json", "{\"message\":\"Credentials updated\"}"); });
-
+    // Get MAC address
     server.on("/get-MAC", HTTP_GET, [this]()
               {
         String mac = WiFi.macAddress();
         server.send(200, "application/json", "{\"macAddress\":\"" + mac + "\"}"); });
 
-    server.on("/success.html", HTTP_GET, [this]()
-              { sendCaptivePortalSuccess("text/html",
-                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
-
+    // ----------------- Test Route -----------------
     server.on("/library/test/success.html", HTTP_GET, [this]()
               { sendCaptivePortalSuccess("text/html",
                                          "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });

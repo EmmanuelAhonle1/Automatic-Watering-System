@@ -9,6 +9,7 @@ bool RGBStateHandler::ledState = false;
 void RGBStateHandler::updateRGBStateISR()
 {
     // Check WiFi Status
+
     if (WiFi.status() == WL_CONNECTED)
     {
         // Use cached ping status instead of pinging directly

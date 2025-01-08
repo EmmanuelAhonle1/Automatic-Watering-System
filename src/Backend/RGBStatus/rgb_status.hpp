@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 #include "../Plant Node/DatabaseCommands.hpp"
+#include "../Device/Pinouts.hpp"
+#include "../Device/DataAcquisition.hpp"
 using namespace std;
 extern RGBLed rgbLed;
 
@@ -29,14 +31,14 @@ public:
 
     /**
      * @brief Set the current state
-     * 
+     *
      * @param state The new state
      */
     void setCurrentState(currentState state);
 
     /**
      * @brief Get the current state
-     * 
+     *
      * @return currentState The current state
      */
     currentState getCurrentState();
@@ -48,7 +50,7 @@ private:
 
     /**
      * @brief Set the RGB color
-     * 
+     *
      * @param r Red value
      * @param g Green value
      * @param b Blue value
@@ -57,14 +59,14 @@ private:
 
     /**
      * @brief Get the RGB color
-     * 
+     *
      * @return vector<int> The RGB color values
      */
     vector<int> getRGBColor();
 
     /**
      * @brief Check if the RGB is on
-     * 
+     *
      * @return true if RGB is on, false otherwise
      */
     bool rgbOn();

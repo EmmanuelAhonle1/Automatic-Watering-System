@@ -6,7 +6,8 @@
 #include "Pinouts.hpp"
 #include <Arduino.h>
 #include <DHT.h> // Include DHT sensor library
-
+#include <Wire.h>
+#include "Adafruit_LC709203F.h"
 class DataAcquisition
 {
 public:
@@ -36,6 +37,17 @@ public:
      * @return float Humidity percentage
      */
     float readHumidity();
+
+    /**
+     * @brief Check if the battery is low
+     * Updates the lowBattery status.
+     */
+    void checkLowBatteryStatus();
+
+    bool isLowBattery() const;
+
+private:
+    Adafruit_LC709203F batteryLevelSensor;
 };
 
 #endif // DATA_ACQUISITION_HPP

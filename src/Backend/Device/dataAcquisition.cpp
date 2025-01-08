@@ -1,5 +1,3 @@
-
-
 #include <unordered_map>
 #include <string>
 #include <DHT.h>
@@ -14,6 +12,14 @@ GravitySoilMoistureSensor soilMoistureSensor;
 Adafruit_VEML7700 ambientLightSensor = Adafruit_VEML7700();
 uint16_t interruptRequest;
 Adafruit_LC709203F batteryLevelSensor = Adafruit_LC709203F();
+volatile bool lowBattery = false;
+
+// Add with your other sensor functions
+void checkLowBatteryStatus()
+{
+    // Set a global flag or take immediate action
+    lowBattery = true; // Make sure to declare lowBattery as a global variable
+}
 
 void setupSensors()
 {
@@ -34,9 +40,20 @@ void setupSensors()
     ambientLightSensor.interruptEnable(true);
 
     // Initialize the battery level sensor
+
+    Wire.begin(BATTERY_PIN_SDA, BATTERY_PIN_SCL);
+
+    if (!batteryLevelSensor.begin())
+    {
+        Serial.println("Battery sensor not found");
+        while (1)
+            delay(10);
+    }
+
     batteryLevelSensor.setThermistorB(3950);
-    batteryLevelSensor.setPackSize(BATTERTY_SIZE);
-    batteryLevelSensor.setAlarmVoltage(3.5);
+    batteryLevelSensor.setPackSize(BATTERY_SIZE);
+    batteryLevelSensor.setAlarmRSOC(20);
+    attachInterrupt(digitalPinToInterrupt(BATTERY_INT_PIN), checkLowBatteryStatus, FALLING);
 }
 
 // Function to read the temperature from the soil sensor
@@ -82,6 +99,16 @@ uint8_t readBatteryLevel()
     uint8_t batteryLevel = batteryLevelSensor.cellPercent();
 
     return batteryLevel;
+}
+
+void DataAcquisition::checkLowBatteryStatus()
+{
+    lowBattery = true;
+}
+
+bool DataAcquisition::isLowBattery() const
+{
+    return lowBattery;
 }
 
 unordered_map<string, int> readAllSensors()
