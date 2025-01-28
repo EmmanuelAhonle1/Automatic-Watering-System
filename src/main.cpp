@@ -22,6 +22,7 @@ RGBStateHandler rgbStateHandler;
 
 Ticker rgbTimer;
 Ticker dataAcquisitionTimer;
+Ticker pingDatabaseTimer;
 
 #define LED_BUILTIN D4
 bool ledState = false;
@@ -39,8 +40,6 @@ void setup()
   }
   rgbTimer.attach_ms(100, []()
                      { rgbStateHandler.updateRGBStateISR(); });
-
-  
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);

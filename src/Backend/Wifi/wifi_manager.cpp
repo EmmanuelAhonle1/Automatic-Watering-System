@@ -7,10 +7,10 @@
 #include "../DB Query Creator/dbQueryCreator.hpp"
 #include "../Plant Node/DatabaseCommands.hpp"
 #include "../RGBStatus/rgb_status.hpp"
+
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
-
 #define LED_BUILTIN 2
 
 // TODO: Add RGB LED statuses for different states
