@@ -2,7 +2,8 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-import PlantCard from "./components/PlantCard/PlantCard";
+import PlantCard from "./components/Dashboard/PlantCard/PlantCard";
+import DashboardHeader from "./components/Dashboard/Header/Header";
 
 const App = () => {
   const plantData = {
@@ -19,7 +20,7 @@ const App = () => {
 
   return (
     <div>
-      <h1 id="awsTitle">Automatic Watering System</h1>
+      <DashboardHeader />
       <div id="card-container" className="card-container">
         <PlantCard plant={plantData} />
         <PlantCard plant={plantData} />

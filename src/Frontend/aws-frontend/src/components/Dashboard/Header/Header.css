@@ -1,0 +1,17 @@
+#dashboard-title {
+  text-transform: uppercase;
+  color: #0000;
+  font-family: sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  background:
+    repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
+      2500px,
+    repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 50%/2500px
+      2500px;
+  background-blend-mode: difference;
+  mix-blend-mode: lighten;
+  -webkit-background-clip: text;
+  background-clip: text;
+}

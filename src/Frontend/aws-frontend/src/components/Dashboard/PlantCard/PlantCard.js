@@ -1,5 +1,5 @@
 import React from "react";
-import "./plantCard.css";
+import "./PlantCard.css";
 
 const PlantCard = ({ plant }) => {
   return (
