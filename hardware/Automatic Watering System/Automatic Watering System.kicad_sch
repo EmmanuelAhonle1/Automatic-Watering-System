@@ -8,6 +8,141 @@
 		(title "Automatic Watering System")
 	)
 	(lib_symbols
+		(symbol "Battery_Management:TP4056_Lipo_Battery_Charging_Board_Module"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U3"
+				(at 0 6.858 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "~"
+				(at 0 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TP4056_Lipo_Battery_Charging_Board_Module_0_1"
+				(rectangle
+					(start -5.08 5.08)
+					(end 5.08 -5.08)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TP4056_Lipo_Battery_Charging_Board_Module_1_1"
+				(pin input line
+					(at -7.62 2.54 0)
+					(length 2.54)
+					(name "BAT+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -7.62 -2.54 0)
+					(length 2.54)
+					(name "BAT-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 7.62 2.54 180)
+					(length 2.54)
+					(name "IN+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 7.62 -2.54 180)
+					(length 2.54)
+					(name "IN-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Connector:Conn_01x03_Pin"
 			(pin_names
 				(offset 1.016) hide)
@@ -2994,321 +3129,6 @@
 				)
 			)
 		)
-		(symbol "TP4056:TP4056"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Value" "TP4056"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-				)
-			)
-			(property "Footprint" "TP4056:SO08-PAD-300"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "MF" "Texas Instruments"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Description_1" "\n                        \n                            Charger Li-Ion Article 1A protection, module with IO TP4056 (micro USB)\n                        \n"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Package" "None"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Price" "None"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "SnapEDA_Link" "https://www.snapeda.com/parts/TP4056/Texas+Instruments/view-part/?ref=snap"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "MP" "TP4056"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Availability" "Not in stock"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(property "Check_prices" "https://www.snapeda.com/parts/TP4056/Texas+Instruments/view-part/?ref=eda"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify bottom)
-					(hide yes)
-				)
-			)
-			(symbol "TP4056_0_0"
-				(rectangle
-					(start -12.7 -10.16)
-					(end 10.16 10.16)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 -2.54 180)
-					(length 5.08)
-					(name "TEMP"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 2.54 180)
-					(length 5.08)
-					(name "PROG"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 -7.62 180)
-					(length 5.08)
-					(name "GND"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -17.78 7.62 0)
-					(length 5.08)
-					(name "VCC"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 7.62 180)
-					(length 5.08)
-					(name "BAT"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -17.78 -7.62 0)
-					(length 5.08)
-					(name "~{STDBY}"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -17.78 -2.54 0)
-					(length 5.08)
-					(name "~{CHRG}"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -17.78 2.54 0)
-					(length 5.08)
-					(name "CE"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 15.24 -7.62 180)
-					(length 5.08)
-					(name "GND"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-					(number "PAD"
-						(effects
-							(font
-								(size 1.016 1.016)
-							)
-						)
-					)
-				)
-			)
-		)
-	)
-	(junction
-		(at 248.92 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "32c49c32-f248-4524-a984-2767eae9b121")
 	)
 	(junction
 		(at 200.66 99.06)
@@ -3317,16 +3137,16 @@
 		(uuid "3bbeb8d4-42d6-42a0-9bda-6f85eb80e02b")
 	)
 	(junction
-		(at 252.73 83.82)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "572a8ddd-06a7-41f9-b07b-525bb544a092")
-	)
-	(junction
 		(at 252.73 99.06)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ace56157-ae9c-47f3-a191-261ed7e4b6a2")
+	)
+	(junction
+		(at 252.73 83.82)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e9c9e76d-9ea8-4385-9e51-1b0802be2ec7")
 	)
 	(no_connect
 		(at 27.94 63.5)
@@ -3343,10 +3163,6 @@
 	(no_connect
 		(at 27.94 81.28)
 		(uuid "4b98164a-2889-490a-a55a-95d415c107df")
-	)
-	(no_connect
-		(at 205.74 88.9)
-		(uuid "4d1a4618-50d4-4cd9-a96e-475dd87287d3")
 	)
 	(no_connect
 		(at 27.94 73.66)
@@ -3371,10 +3187,6 @@
 	(no_connect
 		(at 27.94 86.36)
 		(uuid "adad0749-aa02-4727-878e-62a40a60d634")
-	)
-	(no_connect
-		(at 205.74 93.98)
-		(uuid "b989a0b7-50ea-4100-a292-eb5072b6ba36")
 	)
 	(no_connect
 		(at 27.94 71.12)
@@ -3456,7 +3268,7 @@
 	)
 	(wire
 		(pts
-			(xy 204.47 83.82) (xy 205.74 83.82)
+			(xy 204.47 83.82) (xy 213.36 83.82)
 		)
 		(stroke
 			(width 0)
@@ -3486,26 +3298,6 @@
 	)
 	(wire
 		(pts
-			(xy 252.73 83.82) (xy 238.76 83.82)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "19299b47-2b25-4e16-8d04-b7c5addfca93")
-	)
-	(wire
-		(pts
-			(xy 248.92 88.9) (xy 248.92 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "197d8a3b-05ff-494e-8c8c-25c8b863f69a")
-	)
-	(wire
-		(pts
 			(xy 248.92 99.06) (xy 252.73 99.06)
 		)
 		(stroke
@@ -3526,7 +3318,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 99.06) (xy 205.74 99.06)
+			(xy 200.66 99.06) (xy 209.55 99.06)
 		)
 		(stroke
 			(width 0)
@@ -3586,16 +3378,6 @@
 	)
 	(wire
 		(pts
-			(xy 238.76 88.9) (xy 240.03 88.9)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "34ab976f-b7b7-456a-b0d7-68fa23c32a31")
-	)
-	(wire
-		(pts
 			(xy 223.52 48.26) (xy 224.79 48.26)
 		)
 		(stroke
@@ -3603,6 +3385,16 @@
 			(type default)
 		)
 		(uuid "3886dbe3-fe4a-4701-a16c-9e166939979a")
+	)
+	(wire
+		(pts
+			(xy 209.55 99.06) (xy 209.55 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3eb45404-c100-4c6f-916d-4b8595a5a5d2")
 	)
 	(wire
 		(pts
@@ -3634,16 +3426,6 @@
 		)
 		(uuid "5aa64b7f-07a0-4c1c-919e-78feb19f6d47")
 	)
-	(wire
-		(pts
-			(xy 248.92 99.06) (xy 238.76 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6f8b62e0-2e05-409c-bb58-5d47c555b3c0")
-	)
 	(bus
 		(pts
 			(xy 161.29 63.5) (xy 168.91 63.5)
@@ -3653,6 +3435,26 @@
 			(type default)
 		)
 		(uuid "71907a01-36e3-4288-b7bb-43da01bb462e")
+	)
+	(wire
+		(pts
+			(xy 213.36 87.63) (xy 213.36 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "738ad2d5-b287-435a-a40f-737015814112")
+	)
+	(wire
+		(pts
+			(xy 248.92 92.71) (xy 234.95 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "74f2c0db-596b-417d-b5a8-25157abb0b7e")
 	)
 	(wire
 		(pts
@@ -3686,16 +3488,6 @@
 	)
 	(wire
 		(pts
-			(xy 247.65 88.9) (xy 248.92 88.9)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8a9ea956-d353-46e9-9c59-c27bf683c62c")
-	)
-	(wire
-		(pts
 			(xy 200.66 95.25) (xy 200.66 99.06)
 		)
 		(stroke
@@ -3713,6 +3505,16 @@
 			(type default)
 		)
 		(uuid "9a7870a7-dcd4-45b6-be5a-6c5e20698fff")
+	)
+	(wire
+		(pts
+			(xy 248.92 99.06) (xy 248.92 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9affce92-1aa1-4a49-af77-fc913a988fc8")
 	)
 	(wire
 		(pts
@@ -3746,6 +3548,16 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 83.82) (xy 252.73 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a5c5576c-b45d-405b-ae8e-91318bc047d8")
+	)
+	(wire
+		(pts
 			(xy 246.38 147.32) (xy 243.84 147.32)
 		)
 		(stroke
@@ -3753,16 +3565,6 @@
 			(type default)
 		)
 		(uuid "a70bd5dc-c2c6-402e-9eaa-c5119f971d45")
-	)
-	(wire
-		(pts
-			(xy 252.73 83.82) (xy 252.73 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a73527a9-716f-48ce-a3d4-14a18f831400")
 	)
 	(wire
 		(pts
@@ -3806,6 +3608,16 @@
 	)
 	(wire
 		(pts
+			(xy 252.73 83.82) (xy 252.73 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bc37daad-9240-4288-af84-d365906bc95a")
+	)
+	(wire
+		(pts
 			(xy 161.29 39.37) (xy 162.56 39.37)
 		)
 		(stroke
@@ -3826,6 +3638,36 @@
 	)
 	(wire
 		(pts
+			(xy 248.92 87.63) (xy 234.95 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d752bb15-e1c8-40d2-9976-eb752f47ccb0")
+	)
+	(wire
+		(pts
+			(xy 248.92 83.82) (xy 248.92 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e4309f3d-ec65-4cc4-a600-12a1ab76eb9b")
+	)
+	(wire
+		(pts
+			(xy 209.55 92.71) (xy 219.71 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e7eec42a-95ee-45bc-b5be-162a7cab4d5c")
+	)
+	(wire
+		(pts
 			(xy 158.75 39.37) (xy 161.29 39.37)
 		)
 		(stroke
@@ -3833,6 +3675,16 @@
 			(type default)
 		)
 		(uuid "e8a62877-18af-47db-8b03-e3d1c6952ef4")
+	)
+	(wire
+		(pts
+			(xy 219.71 87.63) (xy 213.36 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea3d7928-79b0-48bb-9a30-17819ab38f2e")
 	)
 	(wire
 		(pts
@@ -4248,7 +4100,7 @@
 			)
 		)
 	)
-	(global_label "GND"
+	(global_label "BATTERY_MON(-)"
 		(shape input)
 		(at 224.79 53.34 0)
 		(fields_autoplaced yes)
@@ -4260,7 +4112,7 @@
 		)
 		(uuid "3463e7a5-2a93-4398-aefc-018d2ffee86e")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 231.6457 53.34 0)
+			(at 243.9224 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4678,28 +4530,6 @@
 			)
 		)
 	)
-	(global_label "GND"
-		(shape input)
-		(at 238.76 93.98 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "bee3aab3-64ba-44b6-a5bf-3487f3e3d047")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 245.6157 93.98 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-	)
 	(global_label "B_PIN"
 		(shape input)
 		(at 179.07 29.21 0)
@@ -4808,7 +4638,7 @@
 			)
 		)
 	)
-	(global_label "VIN"
+	(global_label "BATTERY_MON(+)"
 		(shape input)
 		(at 224.79 55.88 0)
 		(fields_autoplaced yes)
@@ -4820,7 +4650,7 @@
 		)
 		(uuid "f87b6c4c-ce0f-4e93-8b2d-302915486c3c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 230.7991 55.88 0)
+			(at 243.9224 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5555,73 +5385,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 243.84 88.9 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "85c5774b-fb09-423a-bf5b-8818d1720d04")
-		(property "Reference" "R4"
-			(at 243.84 84.582 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "1.2k"
-			(at 243.84 86.36 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal"
-			(at 243.84 90.678 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 243.84 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 243.84 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "a4331d63-8123-43ee-b8b8-8b811a65f292")
-		)
-		(pin "1"
-			(uuid "2b7ff24b-a61b-4a50-a039-27f611763822")
-		)
-		(instances
-			(project "Automatic Watering System"
-				(path "/8f00f023-b473-4be1-a0e7-d5542ef24f86"
-					(reference "R4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Conn_01x03_Pin")
 		(at 158.75 142.24 0)
 		(unit 1)
@@ -5639,7 +5402,7 @@
 				)
 			)
 		)
-		(property "Value" "SEN0193 Analog Capacitive Soil Moisture Sensor"
+		(property "Value" "Soil Moisture Sensor"
 			(at 159.385 137.16 0)
 			(effects
 				(font
@@ -5709,7 +5472,7 @@
 				)
 			)
 		)
-		(property "Value" "LED_RGBA"
+		(property "Value" "STATUS_LED"
 			(at 163.068 26.924 0)
 			(effects
 				(font
@@ -5850,7 +5613,7 @@
 				)
 			)
 		)
-		(property "Value" "Conn_01x05_Socket"
+		(property "Value" "Ambient Light Sensor"
 			(at 136.525 85.09 0)
 			(effects
 				(font
@@ -5904,176 +5667,6 @@
 			(project "Automatic Watering System"
 				(path "/8f00f023-b473-4be1-a0e7-d5542ef24f86"
 					(reference "J2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "TP4056:TP4056")
-		(at 223.52 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ed43693d-9da6-462f-a342-fd457e45ee65")
-		(property "Reference" "U2"
-			(at 222.25 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "TP4056"
-			(at 222.25 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MF" "Texas Instruments"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Description_1" "\n                        \n                            Charger Li-Ion Article 1A protection, module with IO TP4056 (micro USB)\n                        \n"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Package" "None"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Price" "None"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "SnapEDA_Link" "https://www.snapeda.com/parts/TP4056/Texas+Instruments/view-part/?ref=snap"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "MP" "TP4056"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Availability" "Not in stock"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(property "Check_prices" "https://www.snapeda.com/parts/TP4056/Texas+Instruments/view-part/?ref=eda"
-			(at 223.52 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify bottom)
-				(hide yes)
-			)
-		)
-		(pin "4"
-			(uuid "af315ed1-7762-4395-951b-cede148ef4f2")
-		)
-		(pin "2"
-			(uuid "d0701021-52af-493b-9794-28a98c07d58c")
-		)
-		(pin "5"
-			(uuid "a68bbe5b-e894-47ff-a223-aff4b6cdc489")
-		)
-		(pin "1"
-			(uuid "b11e6802-c3ee-42bc-b30a-67a41d00beb7")
-		)
-		(pin "PAD"
-			(uuid "31fdeb98-4205-4a48-9747-213130f88524")
-		)
-		(pin "3"
-			(uuid "7cfc085a-ad4e-4270-9a08-d6d862c5bbc5")
-		)
-		(pin "7"
-			(uuid "7342f185-64ed-490f-a675-1542ba58b554")
-		)
-		(pin "8"
-			(uuid "ffc7a386-ede3-4341-a5ca-f7c68a208cce")
-		)
-		(pin "6"
-			(uuid "422ca319-da34-4517-8455-8a006ab9ab0e")
-		)
-		(instances
-			(project "Automatic Watering System"
-				(path "/8f00f023-b473-4be1-a0e7-d5542ef24f86"
-					(reference "U2")
 					(unit 1)
 				)
 			)
@@ -6417,6 +6010,79 @@
 			(project "Automatic Watering System"
 				(path "/8f00f023-b473-4be1-a0e7-d5542ef24f86"
 					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Battery_Management:TP4056_Lipo_Battery_Charging_Board_Module")
+		(at 227.33 90.17 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fedb0d26-c386-4432-a042-913f01317c89")
+		(property "Reference" "U3"
+			(at 227.33 83.312 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TP4056 Li-Po Battery Charger Module"
+			(at 227.584 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Power Management:TP4056 1A Li-ion Battery Charging Module"
+			(at 227.33 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 227.33 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 227.33 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "4"
+			(uuid "c7132863-49e9-4790-ad50-cd31ec9ff22d")
+		)
+		(pin "2"
+			(uuid "aed515b1-5d77-46c3-8b13-0d40c01aafab")
+		)
+		(pin "3"
+			(uuid "4ece3eb5-ce28-4137-9542-d3c58d389132")
+		)
+		(pin "1"
+			(uuid "52435363-df0f-4b90-86f6-952081a44546")
+		)
+		(instances
+			(project "Automatic Watering System"
+				(path "/8f00f023-b473-4be1-a0e7-d5542ef24f86"
+					(reference "U3")
 					(unit 1)
 				)
 			)
