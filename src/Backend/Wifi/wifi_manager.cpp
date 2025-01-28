@@ -6,7 +6,7 @@
 #include "../Device/device_manager.hpp"
 #include "../DB Query Creator/dbQueryCreator.hpp"
 #include "../Plant Node/DatabaseCommands.hpp"
-
+#include "../RGBStatus/rgb_status.hpp"
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
@@ -14,8 +14,10 @@ IPAddress apIP(192, 168, 4, 1);
 #define LED_BUILTIN 2
 
 // TODO: Add RGB LED statuses for different states
+// In wifi_manager.cpp constructor:
 WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
-    : server(server), deviceManager(deviceManager) {}
+    : server(server),
+      deviceManager(deviceManager) {}
 
 // Set up the DNS server for the captive portal
 void WiFiManager::setupDNS()
@@ -67,39 +69,45 @@ void WiFiManager::disableAccessPoint()
 void WiFiManager::begin()
 {
     bool connected = false;
-    Serial.println("WiFi Manager starting...");
+    Serial.println("on now");
 
-    if (checkValidCredentials())
+    // Check for saved WiFi credentials
+    if (LittleFS.exists("/credentials.json"))
     {
         File file = LittleFS.open("/credentials.json", "r");
-        JsonDocument creds;
-        deserializeJson(creds, file);
-        file.close();
-
-        String ssid = creds["wifi_settings"]["ssid"].as<String>();
-        String password = creds["wifi_settings"]["password"].as<String>();
-
-        connected = connect(ssid, password);
-        if (connected)
+        if (file)
         {
-            Serial.println("Connected to [" + ssid + "] using saved credentials");
-        }
-        else
-        {
-            Serial.println("Failed to connect with saved credentials");
+            StaticJsonDocument<512> creds; // Use StaticJsonDocument
+            DeserializationError error = deserializeJson(creds, file);
+            file.close();
+
+            if (!error)
+            {
+                String ssid = creds["wifi_settings"]["ssid"].as<String>();
+                String password = creds["wifi_settings"]["password"].as<String>();
+
+                connected = connect(ssid, password);
+                if (connected)
+                {
+                    Serial.println("Connected to [" + ssid + "] using saved credentials");
+                }
+            }
         }
     }
 
+    // If no saved credentials or connection failed, start AP mode
     if (!connected)
     {
-        Serial.println("Starting AP mode...");
         setupAccessPoint();
         setupDNS();
     }
 
+    // Always set up the web server to serve the necessary files
     setupConfigRoutes();
     server.begin();
     Serial.println("Web server started");
+
+    // Always set up OTA
     setupArduinoOTA();
 }
 
@@ -110,78 +118,61 @@ void WiFiManager::handleClient()
     server.handleClient();
     ArduinoOTA.handle();
 
-    // Only ping database if we're connected to WiFi
-    if (WiFi.status() == WL_CONNECTED)
-    {
+    // Check connectivity every 5 seconds
+    static unsigned long lastPingTime = 0;
+    if (millis() - lastPingTime > 5000)
+    { // 30 second interval
         DatabaseCommands::pingDatabase();
+        lastPingTime = millis();
     }
 
-    // Check if we should try to reconnect
-    if (WiFi.status() != WL_CONNECTED)
+    // Check WiFi connection status and attempt to reconnect if disconnected
+    bool savedCredentials = false;
+    // Check for saved WiFi credentials
+    if (LittleFS.exists("/credentials.json"))
     {
-        bool hasValidCredentials = checkValidCredentials();
-        if (hasValidCredentials)
+        File file = LittleFS.open("/credentials.json", "r");
+        if (file)
         {
-            Serial.println("WiFi disconnected. Attempting to reconnect...");
-            reconnectWiFi();
+            StaticJsonDocument<512> creds; // Use StaticJsonDocument
+            DeserializationError error = deserializeJson(creds, file);
+            file.close();
+
+            if (!error)
+            {
+                String ssid = creds["ssid"].as<String>();
+                String password = creds["password"].as<String>();
+
+                if (ssid.isEmpty() && password.isEmpty())
+                {
+                    Serial.println("No saved credentials found");
+                }
+                else
+                {
+                    Serial1.println("Saved credentials found");
+                    savedCredentials = true;
+                }
+            }
         }
-        else if (WiFi.getMode() != WIFI_AP)
-        {
-            Serial.println("No valid credentials found. Starting AP mode...");
-            setupAccessPoint();
-            setupDNS();
-        }
+    }
+
+    if (WiFi.status() != WL_CONNECTED && !savedCredentials)
+    {
+        Serial.println("WiFi disconnected. Attempting to reconnect...");
+        reconnectWiFi();
     }
 }
 
-// Add this new method to check for valid credentials
-bool WiFiManager::checkValidCredentials()
-{
-    if (!LittleFS.exists("/credentials.json"))
-    {
-        return false;
-    }
-
-    File file = LittleFS.open("/credentials.json", "r");
-    if (!file)
-    {
-        return false;
-    }
-
-    JsonDocument creds;
-    DeserializationError error = deserializeJson(creds, file);
-    file.close();
-
-    if (error)
-    {
-        return false;
-    }
-
-    // Check if wifi_settings exists and has non-empty ssid and password
-    if (!creds.containsKey("wifi_settings"))
-    {
-        return false;
-    }
-
-    String ssid = creds["wifi_settings"]["ssid"].as<String>();
-    String password = creds["wifi_settings"]["password"].as<String>();
-
-    return !ssid.isEmpty() && !password.isEmpty();
-}
 // Set up the configuration routes for the web server
 void WiFiManager::setupConfigRoutes()
 {
+
     // ----------------- WiFi Configuration -----------------
     // Redirect root URL to /wifi_config/index.html
     server.on("/", HTTP_GET, [this]()
               {
-        File file = LittleFS.open("/wifi_config/index.html", "r");
-        if (!file) {
-            server.send(404, "text/plain", "Configuration page not found");
-            return;
-        }
-        server.streamFile(file, "text/html");
-        file.close(); });
+        server.sendHeader("Location", "/wifi_config/index.html", true);
+        server.send(302, "text/plain", ""); });
 
     // Serve the wifi_config HTML file
     server.on("/wifi_config/index.html", HTTP_GET, [this]()
@@ -217,6 +208,7 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Intro Login -----------------
+
     // Serve the intro_login HTML file
     server.on("/intro_login/index.html", HTTP_GET, [this]()
               {
@@ -251,6 +243,7 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Plant Node Registration -----------------
+
     // Serve the plant_node_registration HTML file
     server.on("/plant_registration/index.html", HTTP_GET, [this]()
               {
@@ -285,9 +278,14 @@ void WiFiManager::setupConfigRoutes()
         file.close(); });
 
     // ----------------- Captive Portal Handler -----------------
-    // Catch-all handler to redirect all other requests to the configuration page
     server.onNotFound([this]()
                       {
+        String host = server.hostHeader();
+        if (host.length() == 0) {
+            server.send(302, "text/plain", "");
+            return;
+        }
+        
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
@@ -315,13 +313,24 @@ void WiFiManager::setupConfigRoutes()
         delay(1000); // Add delay to allow frontend time to redirect
         disableAccessPoint(); });
 
-    // -------------- Captive portal detection endpoints -----------------------
-    // Essential captive portal endpoints for Windows
+    // Captive portal detection endpoints
     server.on("/connecttest.txt", HTTP_GET, [this]()
-              { sendCaptivePortalSuccess("text/plain", "Microsoft NCSI"); });
+              {
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
     server.on("/ncsi.txt", HTTP_GET, [this]()
-              { sendCaptivePortalSuccess("text/plain", "Microsoft NCSI"); });
+              {
+        if (WiFi.status() == WL_CONNECTED) {
+            sendCaptivePortalSuccess("text/plain", "Microsoft NCSI");
+        } else {
+            server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+            server.send(302, "text/plain", "");
+        } });
 
     server.on("/generate_204", HTTP_GET, [this]()
               {
@@ -332,24 +341,28 @@ void WiFiManager::setupConfigRoutes()
             server.send(302, "text/plain", "");
         } });
 
-    // Essential captive portal endpoints for iOS
     server.on("/hotspot-detect.html", HTTP_GET, [this]()
-              { sendCaptivePortalSuccess("text/html",
-                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
+              {
+    if (WiFi.status() == WL_CONNECTED) {
+        sendCaptivePortalSuccess("text/html", 
+            "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+    } else {
+        server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
+        server.send(302, "text/plain", "");
+    } });
 
     server.on("/fwlink", HTTP_GET, [this]()
               {
         server.sendHeader("Location", String("http://") + apIP.toString() + "/", true);
         server.send(302, "text/plain", ""); });
 
-    // ----------------- WiFi Connection -----------------
     // Handle WiFi connection requests
     server.on("/wifi-connect", HTTP_POST, [this]()
               {
         String ssid = server.arg("ssid");
         String password = server.arg("password");
         
-        JsonDocument response;
+        StaticJsonDocument<512> response;
         
         if (ssid.length() == 0) {
             response["success"] = false;
@@ -360,14 +373,9 @@ void WiFiManager::setupConfigRoutes()
                 response["message"] = "Connected to " + ssid;
                 response["ip"] = WiFi.localIP().toString();
                 
-                // Use existing methods to update credentials properly
                 deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
-                
-                // Fetch and update plant settings from database
-                StaticJsonDocument<512> plantSettings = DatabaseCommands::getPlantNodeSettings();
-                if (plantSettings.size() > 0) {  // Check if we got valid settings
-                    deviceManager->updatePlantNodeSettings(plantSettings[0]);
-                }
+
+
             } else {
                 response["success"] = false;
                 response["message"] = "Failed to connect to " + ssid;
@@ -381,7 +389,7 @@ void WiFiManager::setupConfigRoutes()
     // Handle WiFi scan requests
     server.on("/wifi-scan", HTTP_GET, [this]()
               {
-        JsonDocument doc;
+        StaticJsonDocument<512> doc;
         JsonArray array = doc.to<JsonArray>();
         
         int n = WiFi.scanNetworks();
@@ -396,35 +404,15 @@ void WiFiManager::setupConfigRoutes()
         serializeJson(doc, jsonResponse);
         server.send(200, "application/json", jsonResponse); });
 
-    // Handle updating credentials
-    server.on("/update-credentials", HTTP_POST, [this]()
-              {
-        if (server.hasArg("plain") == false) {
-            server.send(400, "application/json", "{\"error\":\"Body not received\"}");
-            return;
-        }
-
-        String body = server.arg("plain");
-        StaticJsonDocument<200> doc;
-        DeserializationError error = deserializeJson(doc, body);
-
-        if (error) {
-            server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
-            return;
-        }
-
-        String ssid = doc["ssid"];
-        String password = doc["password"];
-        
-        server.send(200, "application/json", "{\"message\":\"Credentials updated\"}"); });
-
-    // Get MAC address
     server.on("/get-MAC", HTTP_GET, [this]()
               {
         String mac = WiFi.macAddress();
         server.send(200, "application/json", "{\"macAddress\":\"" + mac + "\"}"); });
 
-    // ----------------- Test Route -----------------
+    server.on("/success.html", HTTP_GET, [this]()
+              { sendCaptivePortalSuccess("text/html",
+                                         "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
+
     server.on("/library/test/success.html", HTTP_GET, [this]()
               { sendCaptivePortalSuccess("text/html",
                                          "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
@@ -434,28 +422,30 @@ void WiFiManager::setupConfigRoutes()
 bool WiFiManager::connect(const String &ssid, const String &password)
 {
     WiFi.mode(WIFI_AP_STA);
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
+
     WiFi.begin(ssid.c_str(), password.c_str());
     WiFi.hostname(deviceManager->getSSID());
 
-    int attempts = 0;
-    Serial.print("Connecting");
-    while (WiFi.status() != WL_CONNECTED && attempts < 10)
+    Serial.printf("Connecting to WiFi. Free heap: %d\n", ESP.getFreeHeap());
+
+    unsigned long startTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 20000)
     {
         Serial.print(".");
-        delay(1000);
-        attempts++;
+        delay(500); // Reduced delay time
     }
-    Serial.println();
 
-    // TODO: update this
     if (WiFi.status() == WL_CONNECTED)
     {
-        deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
-        StaticJsonDocument response = DatabaseCommands::getPlantNodeSettings();
-        deviceManager->updatePlantNodeSettings(response[0]);
+        Serial.println("\nConnected, waiting for stability...");
+        return true;
     }
 
-    return WiFi.status() == WL_CONNECTED;
+    Serial.println("Failed to connect to WiFi");
+    return false;
 }
 
 void WiFiManager::reconnectWiFi()
@@ -465,12 +455,13 @@ void WiFiManager::reconnectWiFi()
         File file = LittleFS.open("/credentials.json", "r");
         if (file)
         {
-            JsonDocument creds;
+            StaticJsonDocument<512> creds;
             DeserializationError error = deserializeJson(creds, file);
             file.close();
 
             if (!error)
             {
+                // Fixed path to wifi settings
                 String ssid = creds["wifi_settings"]["ssid"].as<String>();
                 String password = creds["wifi_settings"]["password"].as<String>();
 

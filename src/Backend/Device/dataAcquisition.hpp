@@ -2,12 +2,16 @@
 #define DATA_ACQUISITION_HPP
 
 #define DEBUG_DATA_ACQUISITION // Enable debug mode
-
+#include <string.h>
 #include "Pinouts.hpp"
 #include <Arduino.h>
 #include <DHT.h> // Include DHT sensor library
 #include <Wire.h>
 #include "Adafruit_LC709203F.h"
+#include <unordered_map>
+
+using namespace std;
+
 class DataAcquisition
 {
 public:
@@ -46,8 +50,11 @@ public:
 
     bool isLowBattery() const;
 
+    unordered_map<string, int> readAllSensors();
+
 private:
     Adafruit_LC709203F batteryLevelSensor;
+
 };
 
 #endif // DATA_ACQUISITION_HPP

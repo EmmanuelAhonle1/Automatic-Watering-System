@@ -20,7 +20,8 @@ WiFiManager wifiManager(server, &deviceManager);
 
 RGBStateHandler rgbStateHandler;
 
-Ticker timer;
+Ticker rgbTimer;
+Ticker dataAcquisitionTimer;
 
 #define LED_BUILTIN D4
 bool ledState = false;
@@ -36,8 +37,10 @@ void setup()
     Serial.println("Failed to mount file system");
     return;
   }
-  timer.attach_ms(100, []()
-                  { rgbStateHandler.updateRGBStateISR(); });
+  rgbTimer.attach_ms(100, []()
+                     { rgbStateHandler.updateRGBStateISR(); });
+
+  
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
