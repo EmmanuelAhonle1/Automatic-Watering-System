@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./CardContainer.css";
-//import { plants } from "./testPlants";
+//import { owned_plants } from "./testPlants";
 import PlantCard from "../PlantCard/PlantCard";
 //const CardContainer = ({ children }) => {
 const fern = {
@@ -45,19 +45,22 @@ const orchid = {
 export const plantArr = [fern, cactus, orchid];
 
 const PlantCardContainer = () => {
-  const [plants, setPlants] = useState([]);
+  const [owned_plants, setPlants] = useState([]);
 
   useEffect(() => {
-    // Fetch plant data
-
+    // TODO: replace with API call
+    // TODO: sanitize fetched data
     const fetchedPlants = plantArr;
+    console.log("Retrieved plants");
     setPlants(fetchedPlants);
   }, []);
 
   return (
     <div className="card-container">
-      {plants
-        ? plants.map((plant) => <PlantCard id={plant.id} plantData={plant} />)
+      {owned_plants
+        ? owned_plants.map((plant) => (
+            <PlantCard id={plant.id} plantData={plant} />
+          ))
         : "Loading..."}
     </div>
   );

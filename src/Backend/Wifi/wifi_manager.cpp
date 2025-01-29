@@ -13,7 +13,6 @@ const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 #define LED_BUILTIN 2
 
-// TODO: Add RGB LED statuses for different states
 // In wifi_manager.cpp constructor:
 WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
     : server(server),
