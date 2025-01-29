@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-import { plants } from "./components/Dashboard/PlantCard/testPlants";
+import { plantArr } from "./components/Dashboard/CardContainer/CardContainer";
 import PlantCard from "./components/Dashboard/PlantCard/PlantCard";
 import DashboardHeader from "./components/Dashboard/Header/Header";
 
@@ -12,9 +12,9 @@ const App = () => {
     <div>
       <DashboardHeader />
       <div id="card-container" className="card-container">
-        <PlantCard plantData={plants[0]} />
-        <PlantCard plantData={plants[1]} />
-        <PlantCard plantData={plants[2]} />
+        <PlantCard plantData={plantArr[0]} />
+        <PlantCard plantData={plantArr[1]} />
+        <PlantCard plantData={plantArr[2]} />
       </div>
     </div>
   );
