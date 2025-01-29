@@ -1,18 +1,18 @@
 import React from "react";
 import "./PlantCard.css";
 
-const PlantCard = ({ plant }) => {
+const PlantCard = ({ plantData }) => {
   return (
     <div className="card">
-      <h2>{plant.name}</h2>
-      <p>Species: {plant.species}</p>
-      <p>Watering Frequency: {plant.wateringFrequency}</p>
-      <p>Soil Moisture: {plant.soilMoisture}</p>
-      <p>Last Watered: {plant.lastWatered}</p>
-      <p>Location: {plant.location}</p>
-      <p>Sunlight Requirements: {plant.sunlightRequirements}</p>
-      <p>Temperature: {plant.temperature}</p>
-      <p>Humidity: {plant.humidity}</p>
+      <h2>{plantData.name}</h2>
+      <p>Species: {plantData.species}</p>
+      <p>Watering Frequency: {plantData.wateringFrequency}</p>
+      <p>Soil Moisture: {plantData.soilMoisture}</p>
+      <p>Last Watered: {plantData.lastWatered}</p>
+      <p>Location: {plantData.location}</p>
+      <p>Sunlight Requirements: {plantData.sunlightRequirements}</p>
+      <p>Temperature: {plantData.temperature}</p>
+      <p>Humidity: {plantData.humidity}</p>
     </div>
   );
 };

@@ -1,30 +1,20 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-
+import { plants } from "./components/Dashboard/PlantCard/testPlants";
 import PlantCard from "./components/Dashboard/PlantCard/PlantCard";
 import DashboardHeader from "./components/Dashboard/Header/Header";
 
 const App = () => {
-  const plantData = {
-    name: "Fern",
-    species: "Adiantum",
-    wateringFrequency: "Every 3 days",
-    soilMoisture: "45%",
-    lastWatered: "2023-10-01",
-    location: "Living Room",
-    sunlightRequirements: "Partial Shade",
-    temperature: "20°C",
-    humidity: "70%",
-  };
+  // Example plant data
 
   return (
     <div>
       <DashboardHeader />
       <div id="card-container" className="card-container">
-        <PlantCard plant={plantData} />
-        <PlantCard plant={plantData} />
-        <PlantCard plant={plantData} />
+        <PlantCard plantData={plants[0]} />
+        <PlantCard plantData={plants[1]} />
+        <PlantCard plantData={plants[2]} />
       </div>
     </div>
   );
