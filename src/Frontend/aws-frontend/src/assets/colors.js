@@ -1,7 +1,0 @@
-export const COLORS = {
-  PRIMARY_TAN: "#D2B48C",
-  CREAM: "#F5F5DC",
-  TEXT_GRAY: "#555555",
-  PLANT_GREEN: "#90A955",
-  DARK_TAN: "#C4A484",
-};

@@ -1,3 +1,5 @@
+@import "../../../theme/colors.css";
+
 #dashboard-title {
   text-transform: uppercase;
   color: #0000;
