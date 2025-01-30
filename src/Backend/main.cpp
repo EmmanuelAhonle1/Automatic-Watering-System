@@ -9,9 +9,9 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "Backend/Device/device_manager.hpp"
-#include "Backend/Wifi/wifi_manager.hpp"
-#include "Backend/RGBStatus/rgb_status.hpp"
+#include "Device/device_manager.hpp"
+#include "Wifi/wifi_manager.hpp"
+#include "RGBStatus/rgb_status.hpp"
 #include <Ticker.h>
 
 ESP8266WebServer server(80);
