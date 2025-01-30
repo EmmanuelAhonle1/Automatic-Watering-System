@@ -42,26 +42,28 @@ const orchid = {
   humidity: "50%",
 };
 
-export const plantArr = [fern, cactus, orchid];
+export const plantArr = [fern, orchid, cactus];
 
 const PlantCardContainer = () => {
-  const [owned_plants, setPlants] = useState([]);
+  const [owned_plants, setOwnedPlants] = useState([]);
 
   useEffect(() => {
     // TODO: replace with API call
     // TODO: sanitize fetched data
     const fetchedPlants = plantArr;
     console.log("Retrieved plants");
-    setPlants(fetchedPlants);
+    setOwnedPlants(fetchedPlants);
   }, []);
 
   return (
     <div className="card-container">
-      {owned_plants
-        ? owned_plants.map((plant) => (
-            <PlantCard id={plant.id} plantData={plant} />
-          ))
-        : "Loading..."}
+      {owned_plants.length > 0 ? (
+        owned_plants.map((plant) => (
+          <PlantCard key={plant.id} plantData={plant} />
+        ))
+      ) : (
+        <p>"Loading..."</p>
+      )}
     </div>
   );
 };
