@@ -10,3 +10,4 @@ src/wifi_pass.hpp
 
 /src/Backend/Credentials/config.h
 
+.env

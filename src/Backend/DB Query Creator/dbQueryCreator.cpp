@@ -8,13 +8,13 @@
 using namespace std;
 
 const string baseUrl = API_URL; // Define your base URL here
-WiFiClientSecure client;
-HTTPClient http;
 
 string sendGetRequest(const string &endpoint, const URLQueryBuilder &queryBuilder)
 {
     string response = "";
     { // Create scope for client objects
+        WiFiClientSecure client;
+        HTTPClient http;
 
         client.setTimeout(5000);
         http.setTimeout(5000);
@@ -38,6 +38,8 @@ string sendGetRequest(const string &endpoint, const URLQueryBuilder &queryBuilde
 
 string sendPostRequest(const string &endpoint, const URLQueryBuilder &queryBuilder)
 {
+    WiFiClientSecure client;
+    HTTPClient http;
     string payload = "";
 
     string url = queryBuilder.build(endpoint);

@@ -48,7 +48,7 @@ void WiFiManager::sendCaptivePortalSuccess(const String &contentType, const Stri
 
     server.send(200, contentType, content);
 }
-
+// yolo
 // Disable the access point and switch to station mode
 void WiFiManager::disableAccessPoint()
 {
