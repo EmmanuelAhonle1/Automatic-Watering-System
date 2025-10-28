@@ -9,9 +9,9 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include "Backend/Device/device_manager.hpp"
-#include "Backend/Wifi/wifi_manager.hpp"
-#include "Backend/RGBStatus/rgb_status.hpp"
+#include "Device/device_manager.hpp"
+#include "Wifi/wifi_manager.hpp"
+#include "RGBStatus/rgb_status.hpp"
 #include <Ticker.h>
 
 ESP8266WebServer server(80);
@@ -20,7 +20,9 @@ WiFiManager wifiManager(server, &deviceManager);
 
 RGBStateHandler rgbStateHandler;
 
-Ticker timer;
+Ticker rgbTimer;
+Ticker dataAcquisitionTimer;
+Ticker pingDatabaseTimer;
 
 #define LED_BUILTIN D4
 bool ledState = false;
@@ -36,8 +38,8 @@ void setup()
     Serial.println("Failed to mount file system");
     return;
   }
-  timer.attach_ms(100, []()
-                  { rgbStateHandler.updateRGBStateISR(); });
+  rgbTimer.attach_ms(100, []()
+                     { rgbStateHandler.updateRGBStateISR(); });
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);

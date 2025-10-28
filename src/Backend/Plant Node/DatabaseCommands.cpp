@@ -10,6 +10,7 @@ unsigned long DatabaseCommands::lastPingTime = 0;
 
 bool DatabaseCommands::pingDatabase()
 {
+    yield();
     unsigned long currentTime = millis();
 
     // Only ping if enough time has elapsed since last ping

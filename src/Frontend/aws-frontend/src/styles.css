@@ -1,0 +1,6 @@
+@import "./theme/colors.css";
+
+body {
+  background-color: var(--color-plant-green);
+  margin: 0;
+}

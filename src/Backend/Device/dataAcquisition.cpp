@@ -111,7 +111,7 @@ bool DataAcquisition::isLowBattery() const
     return lowBattery;
 }
 
-unordered_map<string, int> readAllSensors()
+unordered_map<string, int> DataAcquisition::readAllSensors()
 {
     int temperature = readTemperature();
     int moisture = readMoisture();
@@ -119,7 +119,7 @@ unordered_map<string, int> readAllSensors()
     int humidity = readHumidity();
     uint8_t batteryLevel = readBatteryLevel();
 
-    unordered_map<string, int> sensorData;
+    unordered_map<std::string, int> sensorData;
 
     sensorData["temperature"] = temperature;
     sensorData["moisture"] = moisture;
