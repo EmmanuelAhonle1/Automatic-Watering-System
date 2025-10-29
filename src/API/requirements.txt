@@ -1,0 +1,9 @@
+# Requirements for the Automatic Watering System API (derived from src/API/app.py imports)
+# Note: mysqlclient requires system-level MySQL client headers/libraries
+# (on Debian/Ubuntu: libmysqlclient-dev libssl-dev build-essential). The
+# project's Aptfile (if used for Heroku) may include these packages.
+
+Flask
+Flask-Cors
+flask-mysqldb
+mysqlclient
