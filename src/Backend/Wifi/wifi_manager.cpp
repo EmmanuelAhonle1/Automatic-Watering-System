@@ -11,10 +11,9 @@
 using namespace std;
 const uint8_t DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
-#define LED_BUILTIN 2
 
 // In wifi_manager.cpp constructor:
-WiFiManager::WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager)
+WiFiManager::WiFiManager(WebServer &server, DeviceManager *deviceManager)
     : server(server),
       deviceManager(deviceManager) {}
 
@@ -106,8 +105,12 @@ void WiFiManager::begin()
     server.begin();
     Serial.println("Web server started");
 
-    // Always set up OTA
-    setupArduinoOTA();
+    // Only set up OTA if connected to WiFi
+    if (connected)
+    {
+        setupArduinoOTA();
+        otaInitialized = true;
+    }
 }
 
 // Handle client requests
@@ -115,7 +118,12 @@ void WiFiManager::handleClient()
 {
     dnsServer.processNextRequest();
     server.handleClient();
-    ArduinoOTA.handle();
+
+    // Only handle OTA if it was initialized (WiFi connected)
+    if (otaInitialized)
+    {
+        ArduinoOTA.handle();
+    }
 
     // Check connectivity every 5 seconds
     static unsigned long lastPingTime = 0;
@@ -373,7 +381,12 @@ void WiFiManager::setupConfigRoutes()
                 response["ip"] = WiFi.localIP().toString();
                 
                 deviceManager->updateWifiSettings(ssid, password, WiFi.macAddress());
-
+                
+                // Initialize OTA if not already done
+                if (!otaInitialized) {
+                    setupArduinoOTA();
+                    otaInitialized = true;
+                }
 
             } else {
                 response["success"] = false;
@@ -396,7 +409,7 @@ void WiFiManager::setupConfigRoutes()
             JsonObject network = array.createNestedObject();
             network["ssid"] = WiFi.SSID(i);
             network["rssi"] = WiFi.RSSI(i);
-            network["encrypted"] = WiFi.encryptionType(i) != ENC_TYPE_NONE;
+           //TODO: Find solution for this - network["encrypted"] = WiFi.encryptionType(i) != ENC_TYPE_NONE;
         }
         
         String jsonResponse;
@@ -423,7 +436,8 @@ bool WiFiManager::connect(const String &ssid, const String &password)
     WiFi.mode(WIFI_AP_STA);
     WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
-    WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    // TODO: Find replacement to setSleepMode
+    // WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
     WiFi.begin(ssid.c_str(), password.c_str());
     WiFi.hostname(deviceManager->getSSID());

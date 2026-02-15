@@ -1,6 +1,8 @@
 #include "dbQueryCreator.hpp"
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+// #include <ESP8266WiFi.h>
+// #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 #include <Arduino.h>
 #include <string.h>

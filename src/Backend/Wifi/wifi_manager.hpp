@@ -3,8 +3,10 @@
 
 #define DEBUG_WIFI_MANAGER
 
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+// #include <ESP8266WiFi.h>
+// #include <ESP8266WebServer.h>
+#include <WiFi.h>
+#include <WebServer.h>
 #include <DNSServer.h>
 #include <ArduinoOTA.h>
 #include <LittleFS.h>
@@ -20,7 +22,7 @@ public:
      * @param server Reference to the web server
      * @param deviceManager Pointer to the device manager
      */
-    WiFiManager(ESP8266WebServer &server, DeviceManager *deviceManager);
+    WiFiManager(WebServer &server, DeviceManager *deviceManager);
 
     /**
      * @brief Initialize the WiFi manager
@@ -91,8 +93,9 @@ private:
     bool checkValidCredentials();
 
     DNSServer dnsServer;
-    ESP8266WebServer &server;
+    WebServer &server;
     DeviceManager *deviceManager;
+    bool otaInitialized = false;
 };
 
 #endif // WIFI_MANAGER_HPP

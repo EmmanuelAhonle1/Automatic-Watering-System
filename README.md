@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Automatic Watering System is a smart IoT solution for plant care, built using ESP8266 microcontrollers. The system provides automated plant monitoring and watering capabilities with a web-based interface for configuration and monitoring.
+The Automatic Watering System is a smart IoT solution for plant care, built using ESP32 microcontrollers. The system provides automated plant monitoring and watering capabilities with a web-based interface for configuration and monitoring.
 
 ## Hardware Components
 
-- ESP8266 Microcontroller
+- ESP32 Microcontroller
 - DHT11 Temperature and Humidity Sensor (Pin D5)
 - Capacitive Soil Moisture Sensor (Pin D3)
 - VEML7700 Ambient Light Sensor (Pins D4(SCL), D9(SDA))
@@ -133,7 +133,7 @@ The system provides three main web interfaces:
 
 ### Initial Setup
 
-1. Flash the ESP8266 with the firmware
+1. Flash the ESP32 with the firmware
 2. Power on the device
 3. Connect to the device's AP (Format: "PlantNode-XXXX")
 4. Navigate to the captive portal
@@ -165,10 +165,10 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 ### Requirements
 
 - Arduino IDE or PlatformIO
-- ESP8266 board support
+- ESP32 board support
 - Required Libraries:
-  - ESP8266WiFi
-  - ESP8266WebServer
+  - ESP32WiFi
+  - ESP32WebServer
   - ArduinoJson
   - DHT sensor library
   - VEML7700 library
@@ -180,7 +180,7 @@ API endpoints are defined in `dbQueryCreator.hpp` and configured via `config.h`
 1. Clone the repository
 2. Install required libraries
 3. Configure `config.h` with API credentials (Refer to the [setup guide](docs/setup.md))
-4. Build and flash to ESP8266
+4. Build and flash to ESP32
 
 ## Security Features
 

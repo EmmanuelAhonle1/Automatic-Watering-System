@@ -1,7 +1,8 @@
 #include "rgb_status.hpp"
 #include "RGBLed.h"
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+// #include <ESP8266WiFi.h>
+#include <WiFi.h>
 
 RGBLed rgbLed(RGB_STATUS_RED_PIN, RGB_STATUS_GREEN_PIN, RGB_STATUS_BLUE_PIN, RGBLed::COMMON_ANODE);
 bool RGBStateHandler::ledState = false;

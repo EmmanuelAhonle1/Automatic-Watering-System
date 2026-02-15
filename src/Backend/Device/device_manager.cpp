@@ -1,5 +1,7 @@
 #include "device_manager.hpp"
-#include <ESP8266WiFi.h>
+// #include <ESP8266WiFi.h>
+#include <WiFi.h>
+#include "Pinouts.hpp"
 
 String DeviceManager::generateDeviceName()
 {
@@ -8,11 +10,10 @@ String DeviceManager::generateDeviceName()
     String suffix = "";
 
     // Combine multiple sources of entropy
-    unsigned long seed = ESP.getChipId(); // Unique chip ID
-    seed ^= system_get_time();            // Current system time in microseconds
-    seed ^= ESP.getCycleCount();          // CPU cycle count
-    seed ^= analogRead(A0);               // Random noise from analog pin
-    seed ^= millis();                     // Milliseconds since boot
+    unsigned long seed = (unsigned long)ESP.getEfuseMac(); // Unique chip MAC address
+    seed ^= ESP.getCycleCount();                           // CPU cycle count
+    seed ^= analogRead(SOIL_MOISTURE_PIN);                 // Random noise from analog pin
+    seed ^= millis();                                      // Milliseconds since boot
 
     // Set the random seed
     randomSeed(seed);
@@ -22,7 +23,6 @@ String DeviceManager::generateDeviceName()
     {
         // Add extra randomization per character
         seed ^= ESP.getCycleCount();
-        seed ^= system_get_time();
         random(charsetLength); // Throw away first value
 
         int randomIndex = random(charsetLength);
@@ -76,7 +76,7 @@ String DeviceManager::readNameFromCredentials()
 
 void DeviceManager::begin()
 {
-    randomSeed(ESP.getChipId());
+    randomSeed((unsigned long)ESP.getEfuseMac());
 
     // First try to read existing name
     String storedName = readNameFromCredentials();

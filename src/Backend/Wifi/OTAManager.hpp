@@ -1,7 +1,9 @@
 #pragma once
 #include <Arduino.h>
+#include <WiFi.h>
 #include <ArduinoOTA.h>
-#include <ESP8266mDNS.h>
+#include <ESPmDNS.h>
+#include "../Device/Pinouts.hpp"
 #include "../Device/device_manager.hpp"
 
 /**

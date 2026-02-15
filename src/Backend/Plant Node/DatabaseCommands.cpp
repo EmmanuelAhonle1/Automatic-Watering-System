@@ -3,7 +3,8 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
-#include <ESP8266WiFi.h>
+// #include <ESP8266WiFi.h>
+#include <WiFi.h>
 
 bool DatabaseCommands::lastPingStatus = false;
 unsigned long DatabaseCommands::lastPingTime = 0;

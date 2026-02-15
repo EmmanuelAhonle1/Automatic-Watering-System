@@ -1,20 +1,19 @@
 #include <Arduino.h>
 #include <Ticker.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-#include <WebSocketsServer.h>
+#include <WiFi.h>
+#include <WebServer.h>
 #include <LittleFS.h>
 #include "FS.h"
 #include <ArduinoJson.h>
-#include <ESP8266mDNS.h>
+#include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "Device/device_manager.hpp"
+#include "Device/Pinouts.hpp"
 #include "Wifi/wifi_manager.hpp"
 #include "RGBStatus/rgb_status.hpp"
-#include <Ticker.h>
 
-ESP8266WebServer server(80);
+WebServer server(80);
 DeviceManager deviceManager;
 WiFiManager wifiManager(server, &deviceManager);
 
@@ -24,7 +23,6 @@ Ticker rgbTimer;
 Ticker dataAcquisitionTimer;
 Ticker pingDatabaseTimer;
 
-#define LED_BUILTIN D4
 bool ledState = false;
 
 void setup()
