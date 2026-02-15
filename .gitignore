@@ -6,7 +6,7 @@
 data/server.crt
 data/server.key
 src/wifi_pass.hpp
-
+.vscode
 
 /src/Backend/Credentials/config.h
 
